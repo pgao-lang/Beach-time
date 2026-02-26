@@ -4,6 +4,115 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Beach Day!</title>
+
+<!-- SVG fallbacks must be defined BEFORE images start loading -->
+<script>
+(function () {
+  /* ── sad dog ──────────────────────────────────────────────────────── */
+  var SAD = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230">'
+    + '<ellipse cx="100" cy="222" rx="58" ry="9" fill="rgba(0,0,0,0.12)"/>'
+    /* body */
+    + '<ellipse cx="100" cy="178" rx="48" ry="40" fill="#d4a555"/>'
+    /* head */
+    + '<circle cx="100" cy="108" r="56" fill="#d4a555"/>'
+    /* left ear (droopy) */
+    + '<path d="M50 85 Q26 108 35 146 Q42 162 57 153 Q72 144 66 114 Q62 93 50 85Z" fill="#b07030"/>'
+    /* right ear (droopy) */
+    + '<path d="M150 85 Q174 108 165 146 Q158 162 143 153 Q128 144 134 114 Q138 93 150 85Z" fill="#b07030"/>'
+    /* muzzle */
+    + '<ellipse cx="100" cy="126" rx="32" ry="22" fill="#e8c070"/>'
+    /* whites of eyes */
+    + '<ellipse cx="76" cy="100" rx="11" ry="10" fill="white"/>'
+    + '<ellipse cx="124" cy="100" rx="11" ry="10" fill="white"/>'
+    /* pupils */
+    + '<ellipse cx="78" cy="102" rx="7" ry="7" fill="#1a1a1a"/>'
+    + '<ellipse cx="126" cy="102" rx="7" ry="7" fill="#1a1a1a"/>'
+    /* eye shine */
+    + '<ellipse cx="81" cy="99" rx="2.5" ry="2.5" fill="white"/>'
+    + '<ellipse cx="129" cy="99" rx="2.5" ry="2.5" fill="white"/>'
+    /* sad brows (inner corners raised) */
+    + '<path d="M65 86 Q75 80 85 85" stroke="#8a5020" stroke-width="4" fill="none" stroke-linecap="round"/>'
+    + '<path d="M115 85 Q125 80 135 86" stroke="#8a5020" stroke-width="4" fill="none" stroke-linecap="round"/>'
+    /* nose */
+    + '<ellipse cx="100" cy="117" rx="9" ry="6" fill="#8a5020"/>'
+    /* frown */
+    + '<path d="M80 136 Q100 126 120 136" stroke="#8a5020" stroke-width="3.5" fill="none" stroke-linecap="round"/>'
+    /* tear */
+    + '<path d="M71 110 Q68 118 72 125" stroke="#87ceeb" stroke-width="4" fill="none" stroke-linecap="round"/>'
+    /* paws */
+    + '<ellipse cx="66" cy="212" rx="24" ry="14" fill="#c09040"/>'
+    + '<ellipse cx="134" cy="212" rx="24" ry="14" fill="#c09040"/>'
+    + '<path d="M58 211 Q66 205 74 211" stroke="#a07030" stroke-width="2" fill="none"/>'
+    + '<path d="M126 211 Q134 205 142 211" stroke="#a07030" stroke-width="2" fill="none"/>'
+    + '</svg>';
+
+  /* ── sun cream ────────────────────────────────────────────────────── */
+  var CREAM = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 130">'
+    /* cap */
+    + '<rect x="27" y="5" width="36" height="26" rx="7" fill="#ff9535"/>'
+    + '<rect x="21" y="27" width="48" height="9" rx="3" fill="#d07010"/>'
+    /* tube body */
+    + '<rect x="21" y="34" width="48" height="82" rx="10" fill="white" stroke="#ddd" stroke-width="1.5"/>'
+    /* label area */
+    + '<rect x="26" y="48" width="38" height="52" rx="5" fill="#fffce8"/>'
+    /* sun center */
+    + '<circle cx="45" cy="66" r="10" fill="#f7c948"/>'
+    /* sun rays */
+    + '<line x1="45" y1="51" x2="45" y2="46" stroke="#f7c948" stroke-width="3" stroke-linecap="round"/>'
+    + '<line x1="45" y1="86" x2="45" y2="81" stroke="#f7c948" stroke-width="3" stroke-linecap="round"/>'
+    + '<line x1="30" y1="66" x2="25" y2="66" stroke="#f7c948" stroke-width="3" stroke-linecap="round"/>'
+    + '<line x1="65" y1="66" x2="60" y2="66" stroke="#f7c948" stroke-width="3" stroke-linecap="round"/>'
+    + '<line x1="33" y1="55" x2="29" y2="51" stroke="#f7c948" stroke-width="2.5" stroke-linecap="round"/>'
+    + '<line x1="57" y1="55" x2="61" y2="51" stroke="#f7c948" stroke-width="2.5" stroke-linecap="round"/>'
+    + '<line x1="33" y1="77" x2="29" y2="81" stroke="#f7c948" stroke-width="2.5" stroke-linecap="round"/>'
+    + '<line x1="57" y1="77" x2="61" y2="81" stroke="#f7c948" stroke-width="2.5" stroke-linecap="round"/>'
+    /* SPF text */
+    + '<text x="45" y="90" font-size="9" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold" fill="#d07010">SPF 50</text>'
+    /* rounded bottom */
+    + '<ellipse cx="45" cy="116" rx="24" ry="7" fill="#f0f0f0" stroke="#ddd" stroke-width="1"/>'
+    + '</svg>';
+
+  /* ── swim ring ────────────────────────────────────────────────────── */
+  var RING = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110">'
+    /* four coloured quadrant sectors */
+    /* top-right: yellow */
+    + '<path d="M55 55 L55 5 A50 50 0 0 1 105 55 Z" fill="#f7c948"/>'
+    /* bottom-right: blue */
+    + '<path d="M55 55 L105 55 A50 50 0 0 1 55 105 Z" fill="#3498db"/>'
+    /* bottom-left: yellow */
+    + '<path d="M55 55 L55 105 A50 50 0 0 1 5 55 Z" fill="#f7c948"/>'
+    /* top-left: red */
+    + '<path d="M55 55 L5 55 A50 50 0 0 1 55 5 Z" fill="#e74c3c"/>'
+    /* inner hole – pale blue so it looks like water */
+    + '<circle cx="55" cy="55" r="24" fill="#87d8f0"/>'
+    /* divider lines */
+    + '<line x1="55" y1="5" x2="55" y2="105" stroke="rgba(255,255,255,0.55)" stroke-width="2"/>'
+    + '<line x1="5" y1="55" x2="105" y2="55" stroke="rgba(255,255,255,0.55)" stroke-width="2"/>'
+    /* outer border */
+    + '<circle cx="55" cy="55" r="50" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="2"/>'
+    /* inner border */
+    + '<circle cx="55" cy="55" r="24" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="1.5"/>'
+    /* highlight */
+    + '<ellipse cx="37" cy="21" rx="9" ry="5" fill="rgba(255,255,255,0.45)" transform="rotate(-38,37,21)"/>'
+    + '</svg>';
+
+  function toURI(svg) {
+    return 'data:image/svg+xml,' + encodeURIComponent(svg);
+  }
+
+  window._fb = {
+    sadDog:   toURI(SAD),
+    sunCream: toURI(CREAM),
+    swimRing: toURI(RING)
+  };
+
+  window._setFB = function (img, key) {
+    img.onerror = null;
+    img.src = window._fb[key];
+  };
+}());
+</script>
+
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -22,7 +131,7 @@ body {
   overflow: hidden;
 }
 
-/* ── HUD ── */
+/* ── HUD ────────────────────────────────────────── */
 #hud {
   position: absolute;
   top: 16px;
@@ -33,15 +142,15 @@ body {
   align-items: center;
   gap: 6px;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.82);
   border-radius: 22px;
-  padding: 8px 22px 10px;
-  box-shadow: 0 2px 14px rgba(0,0,0,0.18);
+  padding: 9px 24px 11px;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.2);
   white-space: nowrap;
 }
 
 #progressText {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: #444;
   letter-spacing: 1.5px;
@@ -49,8 +158,8 @@ body {
 }
 
 #progressBar {
-  width: 160px;
-  height: 10px;
+  width: 180px;
+  height: 11px;
   background: #ddd;
   border-radius: 6px;
   overflow: hidden;
@@ -64,14 +173,14 @@ body {
   transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Dog container ── */
+/* ── Dog container ──────────────────────────────── */
 #dogContainer {
   position: absolute;
-  bottom: 22%;
+  bottom: 20%;
   left: 50%;
   transform: translateX(-50%);
-  width: 160px;
-  height: 160px;
+  width: clamp(180px, 22vw, 260px);
+  height: clamp(180px, 22vw, 260px);
 }
 
 #dogSad, #dogHappy {
@@ -84,12 +193,12 @@ body {
 
 #dogHappy { opacity: 0; }
 
-/* ── Equipped items ── */
+/* ── Equipped overlays ──────────────────────────── */
 #equipJuice {
   position: absolute;
-  width: 52px;
-  left: -28px;
-  bottom: 24px;
+  width: 30%;
+  left: -14%;
+  bottom: 22%;
   opacity: 0;
   object-fit: contain;
   transition: opacity 0.35s ease;
@@ -98,9 +207,9 @@ body {
 
 #equipSunCream {
   position: absolute;
-  width: 44px;
-  right: -22px;
-  top: 28px;
+  width: 25%;
+  right: -12%;
+  top: 22%;
   opacity: 0;
   object-fit: contain;
   transition: opacity 0.35s ease;
@@ -109,20 +218,20 @@ body {
 
 #equipSwimRing {
   position: absolute;
-  width: 132px;
+  width: 110%;
   left: 50%;
   transform: translateX(-50%);
-  bottom: -22px;
+  bottom: -12%;
   opacity: 0;
   object-fit: contain;
   transition: opacity 0.35s ease;
   pointer-events: none;
 }
 
-/* ── Sad cloud ── */
+/* ── Sad cloud ──────────────────────────────────── */
 #sadCloud {
   position: absolute;
-  top: -54px;
+  top: -18%;
   left: 50%;
   transform: translateX(-50%);
   transition: opacity 0.55s ease;
@@ -132,57 +241,59 @@ body {
 
 @keyframes cloudFloat {
   0%, 100% { transform: translateX(-50%) translateY(0px); }
-  50%       { transform: translateX(-50%) translateY(-7px); }
+  50%       { transform: translateX(-50%) translateY(-8px); }
 }
 
-/* ── Sand items ── */
+/* ── Sand items ─────────────────────────────────── */
 .sand-item {
   position: absolute;
-  width: 80px;
-  height: 80px;
+  width:  clamp(95px, 11vw, 130px);
+  height: clamp(95px, 11vw, 130px);
   cursor: pointer;
   user-select: none;
-  transition: opacity 0.3s ease, filter 0.2s ease;
+  transition: opacity 0.3s ease;
 }
 
-.sand-item img {
+.sand-item img,
+.sand-item svg {
   width: 100%;
   height: 100%;
   object-fit: contain;
   pointer-events: none;
-  transition: transform 0.18s ease;
+  transition: transform 0.18s ease, filter 0.2s ease;
+  display: block;
 }
 
-.sand-item:hover:not(.used) img {
-  filter: drop-shadow(0 0 10px rgba(255, 220, 0, 0.95)) drop-shadow(0 0 4px rgba(255,180,0,0.7));
+.sand-item:hover:not(.used) img,
+.sand-item:hover:not(.used) svg {
+  filter: drop-shadow(0 0 12px rgba(255, 220, 0, 1)) drop-shadow(0 0 5px rgba(255, 180, 0, 0.8));
   transform: scale(1.1);
-  cursor: pointer;
 }
 
 .sand-item.used {
-  opacity: 0.38;
+  opacity: 0.35;
   pointer-events: none;
 }
 
 /* Checkmark badge */
 .checkmark {
   position: absolute;
-  top: -9px;
-  right: -9px;
-  width: 25px;
-  height: 25px;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
   background: #27ae60;
-  border: 2px solid #fff;
+  border: 2.5px solid #fff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 15px;
   color: white;
   line-height: 1;
   opacity: 0;
   transform: scale(0);
-  transition: opacity 0.2s ease, transform 0.35s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  transition: opacity 0.2s ease, transform 0.38s cubic-bezier(0.68, -0.55, 0.27, 1.55);
   z-index: 10;
 }
 
@@ -192,21 +303,21 @@ body {
 }
 
 /* Item positions */
-#itemJuice    { bottom: 23%; left: 18%; }
-#itemSunCream { bottom: 21%; left: 50%; transform: translateX(-50%); }
-#itemSwimRing { bottom: 23%; right: 18%; }
+#itemJuice    { bottom: 20%; left: 14%; }
+#itemSunCream { bottom: 18%; left: 50%; transform: translateX(-50%); }
+#itemSwimRing { bottom: 20%; right: 14%; }
 
-/* ── Hint text ── */
+/* ── Hint text ──────────────────────────────────── */
 #hintText {
   position: absolute;
-  bottom: 17%;
+  bottom: 14%;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(220, 60, 60, 0.88);
+  background: rgba(210, 50, 50, 0.9);
   color: #fff;
-  padding: 6px 18px;
-  border-radius: 20px;
-  font-size: 14px;
+  padding: 7px 20px;
+  border-radius: 22px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.5px;
   opacity: 0;
@@ -216,49 +327,47 @@ body {
   transition: opacity 0.3s ease;
 }
 
-/* ── Star burst ── */
+/* ── Star burst ─────────────────────────────────── */
 #starBurst {
   position: absolute;
-  top: -90px;
+  top: -42%;
   left: 50%;
   transform: translateX(-50%);
-  width: 130px;
-  height: 90px;
+  width: 140%;
+  height: 110px;
   pointer-events: none;
-  opacity: 1;
 }
 
 .star {
   position: absolute;
   clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
-  animation: starPop 0.9s ease-out forwards;
+  animation: starPop 0.95s ease-out forwards;
   opacity: 0;
 }
 
 @keyframes starPop {
   0%   { transform: scale(0) rotate(0deg);   opacity: 0; }
-  35%  { opacity: 1; transform: scale(1.5) rotate(160deg); }
-  100% { transform: scale(0.4) rotate(340deg) translateY(-24px); opacity: 0; }
+  35%  { opacity: 1; transform: scale(1.6) rotate(160deg); }
+  100% { transform: scale(0.3) rotate(340deg) translateY(-28px); opacity: 0; }
 }
 
-/* ── Shake ── */
+/* ── Shake ──────────────────────────────────────── */
 @keyframes shake {
   0%,100% { transform: translateX(0) rotate(0deg); }
-  14%      { transform: translateX(-9px) rotate(-4deg); }
-  28%      { transform: translateX(9px)  rotate(4deg); }
-  42%      { transform: translateX(-6px) rotate(-2deg); }
-  57%      { transform: translateX(6px)  rotate(2deg); }
+  14%      { transform: translateX(-10px) rotate(-4deg); }
+  28%      { transform: translateX(10px)  rotate(4deg); }
+  42%      { transform: translateX(-7px) rotate(-2deg); }
+  57%      { transform: translateX(7px)  rotate(2deg); }
   71%      { transform: translateX(-3px); }
   85%      { transform: translateX(3px); }
 }
 
-/* Shake variant for centered item */
 @keyframes shakeCentered {
   0%,100% { transform: translateX(-50%) rotate(0deg); }
-  14%      { transform: translateX(calc(-50% - 9px)) rotate(-4deg); }
-  28%      { transform: translateX(calc(-50% + 9px)) rotate(4deg); }
-  42%      { transform: translateX(calc(-50% - 6px)) rotate(-2deg); }
-  57%      { transform: translateX(calc(-50% + 6px)) rotate(2deg); }
+  14%      { transform: translateX(calc(-50% - 10px)) rotate(-4deg); }
+  28%      { transform: translateX(calc(-50% + 10px)) rotate(4deg); }
+  42%      { transform: translateX(calc(-50% - 7px)) rotate(-2deg); }
+  57%      { transform: translateX(calc(-50% + 7px)) rotate(2deg); }
   71%      { transform: translateX(calc(-50% - 3px)); }
   85%      { transform: translateX(calc(-50% + 3px)); }
 }
@@ -266,34 +375,27 @@ body {
 .shake         { animation: shake 0.52s ease !important; }
 .shakeCentered { animation: shakeCentered 0.52s ease !important; }
 
-/* ── Splash ── */
-#splash {
-  position: fixed;
-  pointer-events: none;
-  z-index: 150;
-  opacity: 1;
-}
-
+/* ── Splash ─────────────────────────────────────── */
 .splash-drop {
   position: absolute;
   border-radius: 50%;
-  background: rgba(120, 210, 255, 0.75);
-  animation: splashPop 0.75s ease-out forwards;
+  background: rgba(100, 200, 255, 0.78);
+  animation: splashPop 0.8s ease-out forwards;
 }
 
 @keyframes splashPop {
-  0%   { transform: scale(0);   opacity: 0.85; }
+  0%   { transform: scale(0);   opacity: 0.9; }
   55%  { opacity: 0.6; }
-  100% { transform: scale(3.2); opacity: 0; }
+  100% { transform: scale(3.5); opacity: 0; }
 }
 
-/* ── Dog bob ── */
+/* ── Dog bob ────────────────────────────────────── */
 @keyframes dogBob {
   0%,100% { transform: translateX(-50%) translateY(0px); }
-  50%     { transform: translateX(-50%) translateY(-9px); }
+  50%     { transform: translateX(-50%) translateY(-10px); }
 }
 
-/* ── End overlay ── */
+/* ── End overlay ────────────────────────────────── */
 #endOverlay {
   position: absolute;
   inset: 0;
@@ -301,10 +403,10 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 90, 200, 0.32);
+  background: rgba(0, 80, 190, 0.3);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.85s ease;
+  transition: opacity 0.9s ease;
   z-index: 300;
 }
 
@@ -314,15 +416,15 @@ body {
 }
 
 #endOverlay h1 {
-  font-size: clamp(26px, 6vw, 54px);
+  font-size: clamp(28px, 6vw, 58px);
   color: #fff;
-  text-shadow: 0 3px 12px rgba(0,0,0,0.45);
+  text-shadow: 0 3px 14px rgba(0,0,0,0.5);
   letter-spacing: 4px;
-  animation: bounceIn 0.65s cubic-bezier(0.68,-0.55,0.27,1.55) both;
+  animation: bounceIn 0.7s cubic-bezier(0.68,-0.55,0.27,1.55) both;
 }
 
 #endOverlay .end-sub {
-  font-size: clamp(13px, 2.8vw, 22px);
+  font-size: clamp(14px, 3vw, 24px);
   color: rgba(255,255,255,0.92);
   margin-top: 12px;
   text-shadow: 0 1px 6px rgba(0,0,0,0.3);
@@ -330,7 +432,7 @@ body {
 
 #endOverlay .restart-hint {
   margin-top: 22px;
-  font-size: clamp(10px, 1.8vw, 14px);
+  font-size: clamp(11px, 1.8vw, 15px);
   color: rgba(255,255,255,0.5);
   letter-spacing: 0.5px;
 }
@@ -351,46 +453,54 @@ body {
     <div id="progressBar"><div id="progressFill"></div></div>
   </div>
 
-  <!-- Sand items -->
+  <!-- ── Sand items ── -->
   <div id="itemJuice" class="sand-item">
     <img src="juice.png" alt="Juice">
     <div class="checkmark">&#10003;</div>
   </div>
+
   <div id="itemSunCream" class="sand-item">
-    <img src="sun-cream.png" alt="Sun Cream">
-    <div class="checkmark">&#10003;</div>
-  </div>
-  <div id="itemSwimRing" class="sand-item">
-    <img src="swim-ring.png" alt="Swim Ring">
+    <!-- sun-cream.png is empty; onerror swaps in SVG fallback -->
+    <img src="sun-cream.png" onerror="_setFB(this,'sunCream')" alt="Sun Cream">
     <div class="checkmark">&#10003;</div>
   </div>
 
-  <!-- Dog container -->
+  <div id="itemSwimRing" class="sand-item">
+    <!-- swim-ring.png is empty; onerror swaps in SVG fallback -->
+    <img src="swim-ring.png" onerror="_setFB(this,'swimRing')" alt="Swim Ring">
+    <div class="checkmark">&#10003;</div>
+  </div>
+
+  <!-- ── Dog container ── -->
   <div id="dogContainer">
-    <img id="dogSad"   src="sad-dog.png"   alt="Sad Dog">
-    <img id="dogHappy" src="happy-dog.png" alt="Happy Dog">
+
+    <!-- sad-dog.png is empty; onerror swaps in SVG sad-dog -->
+    <img id="dogSad"   src="sad-dog.png"           onerror="_setFB(this,'sadDog')" alt="Sad Dog">
+    <!-- use the real valid PNG for happy dog -->
+    <img id="dogHappy" src="dog with swim ring.png" alt="Happy Dog">
 
     <!-- Equipped overlays -->
     <img id="equipJuice"    src="juice.png"     alt="">
-    <img id="equipSunCream" src="sun-cream.png" alt="">
-    <img id="equipSwimRing" src="swim-ring.png" alt="">
+    <img id="equipSunCream" src="sun-cream.png" onerror="_setFB(this,'sunCream')" alt="">
+    <img id="equipSwimRing" src="swim-ring.png" onerror="_setFB(this,'swimRing')" alt="">
 
-    <!-- Sad cloud (SVG) -->
+    <!-- Sad cloud SVG -->
     <div id="sadCloud">
-      <svg width="74" height="44" viewBox="0 0 74 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="37" cy="32" rx="29" ry="13" fill="#aaa" opacity="0.68"/>
-        <ellipse cx="23" cy="26" rx="14" ry="10" fill="#b8b8b8" opacity="0.72"/>
-        <ellipse cx="50" cy="25" rx="12" ry="9"  fill="#b8b8b8" opacity="0.72"/>
-        <ellipse cx="37" cy="20" rx="17" ry="12" fill="#cccccc" opacity="0.78"/>
+      <svg width="80" height="48" viewBox="0 0 80 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="40" cy="36" rx="32" ry="14" fill="#aaa" opacity="0.65"/>
+        <ellipse cx="24" cy="29" rx="16" ry="11" fill="#bbb" opacity="0.7"/>
+        <ellipse cx="54" cy="28" rx="14" ry="10" fill="#bbb" opacity="0.7"/>
+        <ellipse cx="40" cy="22" rx="18" ry="13" fill="#ccc" opacity="0.78"/>
       </svg>
     </div>
 
     <!-- Star burst -->
     <div id="starBurst"></div>
-  </div>
 
-  <!-- Splash -->
-  <div id="splash"></div>
+  </div><!-- /dogContainer -->
+
+  <!-- Splash anchor (positioned by JS) -->
+  <div id="splash" style="position:fixed;pointer-events:none;z-index:160;"></div>
 
   <!-- Hint text -->
   <div id="hintText">Not yet!</div>
@@ -408,14 +518,13 @@ body {
 (function () {
   'use strict';
 
-  // ── State ────────────────────────────────────────────
-  let step = 0;          // 0=need juice, 1=suncream, 2=ring, 3=done
-  let busy = false;      // prevent overlapping actions
-  let endShown = false;  // final sequence ran
+  // ── State ─────────────────────────────────────────────────────────
+  let step     = 0;
+  let busy     = false;
+  let endShown = false;
   let hintTimer = null;
 
-  // ── Elements ─────────────────────────────────────────
-  const stage        = document.getElementById('stage');
+  // ── Elements ──────────────────────────────────────────────────────
   const dogContainer = document.getElementById('dogContainer');
   const dogSad       = document.getElementById('dogSad');
   const dogHappy     = document.getElementById('dogHappy');
@@ -434,262 +543,206 @@ body {
   const equipSunCream= document.getElementById('equipSunCream');
   const equipSwimRing= document.getElementById('equipSwimRing');
 
-  // Item descriptor order matches required step order
   const ITEMS = [
     { el: itemJuice,    equip: equipJuice,    stepIdx: 0, centered: false },
     { el: itemSunCream, equip: equipSunCream,  stepIdx: 1, centered: true  },
     { el: itemSwimRing, equip: equipSwimRing,  stepIdx: 2, centered: false },
   ];
 
-  // ── Setup ─────────────────────────────────────────────
+  // ── Init ──────────────────────────────────────────────────────────
   function init() {
-    ITEMS.forEach(item => {
-      item.el.addEventListener('click', () => onItemClick(item));
-    });
+    ITEMS.forEach(item => item.el.addEventListener('click', () => onItemClick(item)));
     endOverlay.addEventListener('click', restart);
   }
 
-  // ── Click handler ─────────────────────────────────────
+  // ── Click ─────────────────────────────────────────────────────────
   function onItemClick(item) {
     if (busy || endShown) return;
     if (item.el.classList.contains('used')) return;
-
-    if (item.stepIdx === step) {
-      applyItem(item);
-    } else {
-      wrongItem(item);
-    }
+    if (item.stepIdx === step) applyItem(item);
+    else                       wrongItem(item);
   }
 
-  // ── Wrong order feedback ──────────────────────────────
+  // ── Wrong order ───────────────────────────────────────────────────
   function wrongItem(item) {
-    // Shake – use centered variant if item is center-positioned
     item.el.classList.remove('shake', 'shakeCentered');
-    void item.el.offsetWidth; // force reflow
+    void item.el.offsetWidth;
     item.el.classList.add(item.centered ? 'shakeCentered' : 'shake');
     setTimeout(() => item.el.classList.remove('shake', 'shakeCentered'), 560);
 
-    // Hint text
     if (hintTimer) clearTimeout(hintTimer);
     hintText.style.opacity = '1';
     hintTimer = setTimeout(() => { hintText.style.opacity = '0'; }, 1500);
   }
 
-  // ── Correct item: fly to dog ──────────────────────────
+  // ── Apply correct item ────────────────────────────────────────────
   function applyItem(item) {
     busy = true;
     flyToDog(item, () => {
-      // Equip overlay
       item.equip.style.opacity = '1';
-
-      // Disable sand tile
       item.el.classList.add('used');
-
-      // Checkmark badge
       item.el.querySelector('.checkmark').classList.add('shown');
-
-      // Advance step & HUD
       step++;
       updateHUD();
-
       busy = false;
-
-      if (step === 3) {
-        setTimeout(completeAll, 420);
-      }
+      if (step === 3) setTimeout(completeAll, 420);
     });
   }
 
-  // ── Animate item flying to dog ────────────────────────
+  // ── Fly animation ─────────────────────────────────────────────────
   function flyToDog(item, cb) {
     const fromRect = item.el.getBoundingClientRect();
     const dogRect  = dogContainer.getBoundingClientRect();
 
+    // Get source image (which may now be a data-URI SVG after onerror)
+    const imgEl = item.el.querySelector('img');
     const clone = document.createElement('img');
-    clone.src = item.el.querySelector('img').src;
-    const startX = fromRect.left + fromRect.width  / 2 - 36;
-    const startY = fromRect.top  + fromRect.height / 2 - 36;
-    clone.style.cssText = `
-      position: fixed;
-      width: 72px; height: 72px;
-      object-fit: contain;
-      pointer-events: none;
-      z-index: 500;
-      left: ${startX}px;
-      top:  ${startY}px;
-      transition:
-        left  0.62s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-        top   0.62s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-        transform 0.62s ease,
-        opacity   0.18s ease 0.52s;
-    `;
+    clone.src   = imgEl.currentSrc || imgEl.src;
+
+    const startX = fromRect.left + fromRect.width  / 2 - 38;
+    const startY = fromRect.top  + fromRect.height / 2 - 38;
+
+    clone.style.cssText = [
+      'position:fixed',
+      'width:76px', 'height:76px',
+      'object-fit:contain',
+      'pointer-events:none',
+      'z-index:500',
+      'left:' + startX + 'px',
+      'top:'  + startY + 'px',
+      'transition:left .65s cubic-bezier(.25,.46,.45,.94),'
+                + 'top .65s cubic-bezier(.25,.46,.45,.94),'
+                + 'transform .65s ease,'
+                + 'opacity .18s ease .54s',
+    ].join(';');
     document.body.appendChild(clone);
 
-    const targetX = dogRect.left + dogRect.width  / 2 - 36;
-    const targetY = dogRect.top  + dogRect.height / 2 - 36;
+    const tx = dogRect.left + dogRect.width  / 2 - 38;
+    const ty = dogRect.top  + dogRect.height / 2 - 38;
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        clone.style.left      = targetX + 'px';
-        clone.style.top       = targetY + 'px';
-        clone.style.transform = 'scale(0.5)';
-        clone.style.opacity   = '0';
-      });
-    });
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      clone.style.left      = tx + 'px';
+      clone.style.top       = ty + 'px';
+      clone.style.transform = 'scale(0.5)';
+      clone.style.opacity   = '0';
+    }));
 
-    setTimeout(() => {
-      document.body.removeChild(clone);
-      cb();
-    }, 780);
+    setTimeout(() => { document.body.removeChild(clone); cb(); }, 800);
   }
 
-  // ── HUD update ────────────────────────────────────────
+  // ── HUD ───────────────────────────────────────────────────────────
   function updateHUD() {
-    progressText.textContent = `PREP: ${step} / 3`;
-    progressFill.style.width = `${(step / 3) * 100}%`;
+    progressText.textContent = 'PREP: ' + step + ' / 3';
+    progressFill.style.width = (step / 3 * 100) + '%';
   }
 
-  // ── All 3 done ────────────────────────────────────────
+  // ── All 3 applied ─────────────────────────────────────────────────
   function completeAll() {
     busy = true;
-
-    // Remove sad cloud
     sadCloud.style.opacity = '0';
-
-    // Stars
     fireStars();
-
     setTimeout(() => {
-      // Dog crossfade
       dogSad.style.opacity   = '0';
       dogHappy.style.opacity = '1';
-
-      setTimeout(moveDogToOcean, 850);
-    }, 1050);
+      setTimeout(moveDogToOcean, 900);
+    }, 1100);
   }
 
-  // ── Stars ─────────────────────────────────────────────
+  // ── Stars ─────────────────────────────────────────────────────────
   function fireStars() {
     starBurst.innerHTML = '';
-    const palette = ['#FFD700','#FF6B6B','#7ECEF6','#98FB98','#FF69B4','#FFA500'];
+    const pal  = ['#FFD700','#FF6B6B','#7ECEF6','#98FB98','#FF69B4','#FFA500'];
     const spots = [
-      { l:  '8%', t: '50%' }, { l: '25%', t: '15%' }, { l: '50%', t: '55%' },
-      { l: '72%', t: '10%' }, { l: '92%', t: '48%' }, { l: '18%', t: '80%' },
-      { l: '50%', t:  '0%' }, { l: '82%', t: '78%' },
+      '8% 50%','25% 12%','50% 55%','74% 10%','92% 48%',
+      '18% 82%','50% 0%','82% 80%'
     ];
     spots.forEach((pos, i) => {
+      const [l, t] = pos.split(' ');
       const s = document.createElement('div');
       s.className = 'star';
-      const sz = 8 + (i % 4) * 3;
-      s.style.cssText = `
-        left: ${pos.l}; top: ${pos.t};
-        width: ${sz}px; height: ${sz}px;
-        background: ${palette[i % palette.length]};
-        animation-delay: ${i * 0.09}s;
-      `;
+      s.style.cssText = 'left:' + l + ';top:' + t
+        + ';width:' + (9 + (i % 4) * 3) + 'px'
+        + ';height:' + (9 + (i % 4) * 3) + 'px'
+        + ';background:' + pal[i % pal.length]
+        + ';animation-delay:' + (i * 0.09) + 's';
       starBurst.appendChild(s);
     });
-    setTimeout(() => { starBurst.innerHTML = ''; }, 2200);
+    setTimeout(() => { starBurst.innerHTML = ''; }, 2400);
   }
 
-  // ── Move dog to ocean ─────────────────────────────────
+  // ── Move dog to ocean ─────────────────────────────────────────────
   function moveDogToOcean() {
-    dogContainer.style.transition = 'bottom 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
-    dogContainer.style.bottom = '56%';
-
+    dogContainer.style.transition = 'bottom 1.6s cubic-bezier(.4,0,.2,1)';
+    dogContainer.style.bottom = '58%';
     setTimeout(() => {
       showSplash();
       setTimeout(() => {
-        // Bob forever
         dogContainer.style.transition = 'none';
         dogContainer.style.animation  = 'dogBob 1.6s ease-in-out infinite';
         showEndScreen();
-      }, 850);
-    }, 1550);
+      }, 900);
+    }, 1650);
   }
 
-  // ── Splash effect ─────────────────────────────────────
+  // ── Splash ────────────────────────────────────────────────────────
   function showSplash() {
-    const dogRect = dogContainer.getBoundingClientRect();
-    const cx = dogRect.left + dogRect.width / 2;
-    const cy = dogRect.bottom - dogRect.height * 0.25;
+    const r  = dogContainer.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.bottom - r.height * 0.22;
 
-    splash.style.cssText = `
-      position: fixed;
-      left: ${cx - 60}px;
-      top:  ${cy - 30}px;
-      width: 120px;
-      height: 60px;
-      pointer-events: none;
-      z-index: 160;
-      opacity: 1;
-    `;
+    Object.assign(splash.style, {
+      left:   (cx - 65) + 'px',
+      top:    (cy - 32) + 'px',
+      width:  '130px',
+      height: '65px',
+      opacity:'1',
+    });
     splash.innerHTML = '';
 
-    const drops = [
-      { l:'10%', t:'40%', s:18, d:0    },
-      { l:'30%', t:'0%',  s:25, d:0.07 },
-      { l:'50%', t:'50%', s:20, d:0.04 },
-      { l:'65%', t:'5%',  s:30, d:0.1  },
-      { l:'82%', t:'35%', s:16, d:0.03 },
-      { l:'45%', t:'-20%',s:22, d:0.06 },
-    ];
-    drops.forEach(d => {
+    [
+      [10, 42, 19, 0],    [30, 0,  26, 0.07],
+      [50, 52, 21, 0.04], [65, 5,  32, 0.1 ],
+      [82, 38, 17, 0.03], [44,-22, 23, 0.06],
+    ].forEach(([l, t, sz, d]) => {
       const dr = document.createElement('div');
       dr.className = 'splash-drop';
-      dr.style.cssText = `
-        left: ${d.l}; top: ${d.t};
-        width: ${d.s}px; height: ${d.s}px;
-        animation-delay: ${d.d}s;
-      `;
+      dr.style.cssText = 'left:' + l + '%;top:' + t + '%;width:' + sz + 'px;height:' + sz + 'px;animation-delay:' + d + 's';
       splash.appendChild(dr);
     });
 
-    setTimeout(() => { splash.innerHTML = ''; }, 1300);
+    setTimeout(() => { splash.innerHTML = ''; }, 1400);
   }
 
-  // ── End screen ────────────────────────────────────────
+  // ── End screen ────────────────────────────────────────────────────
   function showEndScreen() {
     endShown = true;
     busy     = false;
     endOverlay.classList.add('visible');
   }
 
-  // ── Restart ───────────────────────────────────────────
+  // ── Restart ───────────────────────────────────────────────────────
   function restart() {
-    // Reset flags
     step     = 0;
     busy     = false;
     endShown = false;
 
-    // HUD
     updateHUD();
-
-    // Hide overlay
     endOverlay.classList.remove('visible');
 
-    // Dog: reset position + images
     dogContainer.style.transition = 'none';
     dogContainer.style.animation  = 'none';
-    dogContainer.style.bottom     = '22%';
+    dogContainer.style.bottom     = '20%';
     dogContainer.style.left       = '50%';
     dogSad.style.opacity   = '1';
     dogHappy.style.opacity = '0';
 
-    // Sad cloud back
     sadCloud.style.opacity = '1';
+    starBurst.innerHTML    = '';
 
-    // Stars gone
-    starBurst.innerHTML = '';
-
-    // Hint gone
     if (hintTimer) clearTimeout(hintTimer);
     hintText.style.opacity = '0';
+    splash.innerHTML       = '';
 
-    // Splash gone
-    splash.innerHTML = '';
-
-    // Reset all items
     ITEMS.forEach(item => {
       item.el.classList.remove('used', 'shake', 'shakeCentered');
       item.el.querySelector('.checkmark').classList.remove('shown');
@@ -698,7 +751,6 @@ body {
   }
 
   init();
-
 }());
 </script>
 </body>
