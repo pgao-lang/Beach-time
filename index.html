@@ -68,11 +68,11 @@ body {
 /* ── Dog container ──────────────────────────────── */
 #dogContainer {
   position: absolute;
-  bottom: 20%;
+  bottom: 18%;
   left: 50%;
   transform: translateX(-50%);
-  width: clamp(180px, 22vw, 260px);
-  height: clamp(180px, 22vw, 260px);
+  width: clamp(260px, 32vw, 400px);
+  height: clamp(260px, 32vw, 400px);
 }
 
 #dogSad, #dogHappy {
@@ -139,8 +139,8 @@ body {
 /* ── Sand items ─────────────────────────────────── */
 .sand-item {
   position: absolute;
-  width:  clamp(95px, 11vw, 130px);
-  height: clamp(95px, 11vw, 130px);
+  width:  clamp(130px, 17vw, 210px);
+  height: clamp(130px, 17vw, 210px);
   cursor: pointer;
   user-select: none;
   transition: opacity 0.3s ease;
@@ -618,7 +618,7 @@ body {
 
     dogContainer.style.transition = 'none';
     dogContainer.style.animation  = 'none';
-    dogContainer.style.bottom     = '20%';
+    dogContainer.style.bottom     = '18%';
     dogContainer.style.left       = '50%';
     dogSad.style.opacity   = '1';
     dogHappy.style.opacity = '0';
