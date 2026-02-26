@@ -5,114 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Beach Day!</title>
 
-<!-- SVG fallbacks must be defined BEFORE images start loading -->
-<script>
-(function () {
-  /* ── sad dog ──────────────────────────────────────────────────────── */
-  var SAD = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230">'
-    + '<ellipse cx="100" cy="222" rx="58" ry="9" fill="rgba(0,0,0,0.12)"/>'
-    /* body */
-    + '<ellipse cx="100" cy="178" rx="48" ry="40" fill="#d4a555"/>'
-    /* head */
-    + '<circle cx="100" cy="108" r="56" fill="#d4a555"/>'
-    /* left ear (droopy) */
-    + '<path d="M50 85 Q26 108 35 146 Q42 162 57 153 Q72 144 66 114 Q62 93 50 85Z" fill="#b07030"/>'
-    /* right ear (droopy) */
-    + '<path d="M150 85 Q174 108 165 146 Q158 162 143 153 Q128 144 134 114 Q138 93 150 85Z" fill="#b07030"/>'
-    /* muzzle */
-    + '<ellipse cx="100" cy="126" rx="32" ry="22" fill="#e8c070"/>'
-    /* whites of eyes */
-    + '<ellipse cx="76" cy="100" rx="11" ry="10" fill="white"/>'
-    + '<ellipse cx="124" cy="100" rx="11" ry="10" fill="white"/>'
-    /* pupils */
-    + '<ellipse cx="78" cy="102" rx="7" ry="7" fill="#1a1a1a"/>'
-    + '<ellipse cx="126" cy="102" rx="7" ry="7" fill="#1a1a1a"/>'
-    /* eye shine */
-    + '<ellipse cx="81" cy="99" rx="2.5" ry="2.5" fill="white"/>'
-    + '<ellipse cx="129" cy="99" rx="2.5" ry="2.5" fill="white"/>'
-    /* sad brows (inner corners raised) */
-    + '<path d="M65 86 Q75 80 85 85" stroke="#8a5020" stroke-width="4" fill="none" stroke-linecap="round"/>'
-    + '<path d="M115 85 Q125 80 135 86" stroke="#8a5020" stroke-width="4" fill="none" stroke-linecap="round"/>'
-    /* nose */
-    + '<ellipse cx="100" cy="117" rx="9" ry="6" fill="#8a5020"/>'
-    /* frown */
-    + '<path d="M80 136 Q100 126 120 136" stroke="#8a5020" stroke-width="3.5" fill="none" stroke-linecap="round"/>'
-    /* tear */
-    + '<path d="M71 110 Q68 118 72 125" stroke="#87ceeb" stroke-width="4" fill="none" stroke-linecap="round"/>'
-    /* paws */
-    + '<ellipse cx="66" cy="212" rx="24" ry="14" fill="#c09040"/>'
-    + '<ellipse cx="134" cy="212" rx="24" ry="14" fill="#c09040"/>'
-    + '<path d="M58 211 Q66 205 74 211" stroke="#a07030" stroke-width="2" fill="none"/>'
-    + '<path d="M126 211 Q134 205 142 211" stroke="#a07030" stroke-width="2" fill="none"/>'
-    + '</svg>';
-
-  /* ── sun cream ────────────────────────────────────────────────────── */
-  var CREAM = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 130">'
-    /* cap */
-    + '<rect x="27" y="5" width="36" height="26" rx="7" fill="#ff9535"/>'
-    + '<rect x="21" y="27" width="48" height="9" rx="3" fill="#d07010"/>'
-    /* tube body */
-    + '<rect x="21" y="34" width="48" height="82" rx="10" fill="white" stroke="#ddd" stroke-width="1.5"/>'
-    /* label area */
-    + '<rect x="26" y="48" width="38" height="52" rx="5" fill="#fffce8"/>'
-    /* sun center */
-    + '<circle cx="45" cy="66" r="10" fill="#f7c948"/>'
-    /* sun rays */
-    + '<line x1="45" y1="51" x2="45" y2="46" stroke="#f7c948" stroke-width="3" stroke-linecap="round"/>'
-    + '<line x1="45" y1="86" x2="45" y2="81" stroke="#f7c948" stroke-width="3" stroke-linecap="round"/>'
-    + '<line x1="30" y1="66" x2="25" y2="66" stroke="#f7c948" stroke-width="3" stroke-linecap="round"/>'
-    + '<line x1="65" y1="66" x2="60" y2="66" stroke="#f7c948" stroke-width="3" stroke-linecap="round"/>'
-    + '<line x1="33" y1="55" x2="29" y2="51" stroke="#f7c948" stroke-width="2.5" stroke-linecap="round"/>'
-    + '<line x1="57" y1="55" x2="61" y2="51" stroke="#f7c948" stroke-width="2.5" stroke-linecap="round"/>'
-    + '<line x1="33" y1="77" x2="29" y2="81" stroke="#f7c948" stroke-width="2.5" stroke-linecap="round"/>'
-    + '<line x1="57" y1="77" x2="61" y2="81" stroke="#f7c948" stroke-width="2.5" stroke-linecap="round"/>'
-    /* SPF text */
-    + '<text x="45" y="90" font-size="9" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold" fill="#d07010">SPF 50</text>'
-    /* rounded bottom */
-    + '<ellipse cx="45" cy="116" rx="24" ry="7" fill="#f0f0f0" stroke="#ddd" stroke-width="1"/>'
-    + '</svg>';
-
-  /* ── swim ring ────────────────────────────────────────────────────── */
-  var RING = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110">'
-    /* four coloured quadrant sectors */
-    /* top-right: yellow */
-    + '<path d="M55 55 L55 5 A50 50 0 0 1 105 55 Z" fill="#f7c948"/>'
-    /* bottom-right: blue */
-    + '<path d="M55 55 L105 55 A50 50 0 0 1 55 105 Z" fill="#3498db"/>'
-    /* bottom-left: yellow */
-    + '<path d="M55 55 L55 105 A50 50 0 0 1 5 55 Z" fill="#f7c948"/>'
-    /* top-left: red */
-    + '<path d="M55 55 L5 55 A50 50 0 0 1 55 5 Z" fill="#e74c3c"/>'
-    /* inner hole – pale blue so it looks like water */
-    + '<circle cx="55" cy="55" r="24" fill="#87d8f0"/>'
-    /* divider lines */
-    + '<line x1="55" y1="5" x2="55" y2="105" stroke="rgba(255,255,255,0.55)" stroke-width="2"/>'
-    + '<line x1="5" y1="55" x2="105" y2="55" stroke="rgba(255,255,255,0.55)" stroke-width="2"/>'
-    /* outer border */
-    + '<circle cx="55" cy="55" r="50" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="2"/>'
-    /* inner border */
-    + '<circle cx="55" cy="55" r="24" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="1.5"/>'
-    /* highlight */
-    + '<ellipse cx="37" cy="21" rx="9" ry="5" fill="rgba(255,255,255,0.45)" transform="rotate(-38,37,21)"/>'
-    + '</svg>';
-
-  function toURI(svg) {
-    return 'data:image/svg+xml,' + encodeURIComponent(svg);
-  }
-
-  window._fb = {
-    sadDog:   toURI(SAD),
-    sunCream: toURI(CREAM),
-    swimRing: toURI(RING)
-  };
-
-  window._setFB = function (img, key) {
-    img.onerror = null;
-    img.src = window._fb[key];
-  };
-}());
-</script>
-
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -460,29 +352,25 @@ body {
   </div>
 
   <div id="itemSunCream" class="sand-item">
-    <!-- sun-cream.png is empty; onerror swaps in SVG fallback -->
-    <img src="sun-cream.png" onerror="_setFB(this,'sunCream')" alt="Sun Cream">
+    <img src="sun-cream.png" alt="Sun Cream">
     <div class="checkmark">&#10003;</div>
   </div>
 
   <div id="itemSwimRing" class="sand-item">
-    <!-- swim-ring.png is empty; onerror swaps in SVG fallback -->
-    <img src="swim-ring.png" onerror="_setFB(this,'swimRing')" alt="Swim Ring">
+    <img src="swim-ring.png" alt="Swim Ring">
     <div class="checkmark">&#10003;</div>
   </div>
 
   <!-- ── Dog container ── -->
   <div id="dogContainer">
 
-    <!-- sad-dog.png is empty; onerror swaps in SVG sad-dog -->
-    <img id="dogSad"   src="sad-dog.png"           onerror="_setFB(this,'sadDog')" alt="Sad Dog">
-    <!-- use the real valid PNG for happy dog -->
-    <img id="dogHappy" src="dog with swim ring.png" alt="Happy Dog">
+    <img id="dogSad"   src="sad-dog.png"   alt="Sad Dog">
+    <img id="dogHappy" src="happy-dog.png" alt="Happy Dog">
 
     <!-- Equipped overlays -->
     <img id="equipJuice"    src="juice.png"     alt="">
-    <img id="equipSunCream" src="sun-cream.png" onerror="_setFB(this,'sunCream')" alt="">
-    <img id="equipSwimRing" src="swim-ring.png" onerror="_setFB(this,'swimRing')" alt="">
+    <img id="equipSunCream" src="sun-cream.png" alt="">
+    <img id="equipSwimRing" src="swim-ring.png" alt="">
 
     <!-- Sad cloud SVG -->
     <div id="sadCloud">
@@ -594,7 +482,6 @@ body {
     const fromRect = item.el.getBoundingClientRect();
     const dogRect  = dogContainer.getBoundingClientRect();
 
-    // Get source image (which may now be a data-URI SVG after onerror)
     const imgEl = item.el.querySelector('img');
     const clone = document.createElement('img');
     clone.src   = imgEl.currentSrc || imgEl.src;
