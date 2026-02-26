@@ -75,7 +75,7 @@ body {
   height: clamp(360px, 46vw, 580px);
 }
 
-#dogSad, #dogHappy {
+#dogSad, #dogJuice, #dogJuiceCream, #dogHappy {
   position: absolute;
   top: 0; left: 0;
   width: 100%; height: 100%;
@@ -83,6 +83,8 @@ body {
   transition: opacity 0.65s ease;
 }
 
+#dogJuice,
+#dogJuiceCream,
 #dogHappy { opacity: 0; }
 
 /* ── Equipped overlays ──────────────────────────── */
@@ -401,8 +403,10 @@ body {
   <!-- ── Dog container ── -->
   <div id="dogContainer">
 
-    <img id="dogSad"   src="sad-dog.png"   alt="Sad Dog">
-    <img id="dogHappy" src="happy-dog.png" alt="Happy Dog">
+    <img id="dogSad"       src="sad-dog.png"              alt="Sad Dog">
+    <img id="dogJuice"     src="dog-juice.png"            alt="Dog with Juice">
+    <img id="dogJuiceCream" src="dog-juice-sun cream.png" alt="Dog with Juice and Sun Cream">
+    <img id="dogHappy"     src="happy-dog.png"            alt="Happy Dog">
 
     <!-- Equipped overlays -->
     <img id="equipJuice"    src="juice.png"     alt="">
@@ -456,10 +460,16 @@ body {
   let dragOY     = 0;
 
   // ── Elements ──────────────────────────────────────────────────────
-  const dogContainer = document.getElementById('dogContainer');
-  const dogSad       = document.getElementById('dogSad');
-  const dogHappy     = document.getElementById('dogHappy');
-  const sadCloud     = document.getElementById('sadCloud');
+  const dogContainer  = document.getElementById('dogContainer');
+  const dogSad        = document.getElementById('dogSad');
+  const dogJuice      = document.getElementById('dogJuice');
+  const dogJuiceCream = document.getElementById('dogJuiceCream');
+  const dogHappy      = document.getElementById('dogHappy');
+  const sadCloud      = document.getElementById('sadCloud');
+
+  // Intermediate dog states indexed by step count (0–3)
+  const DOG_STATES = [dogSad, dogJuice, dogJuiceCream, dogHappy];
+  let activeDog = dogSad;
   const starBurst    = document.getElementById('starBurst');
   const hintText     = document.getElementById('hintText');
   const endOverlay   = document.getElementById('endOverlay');
@@ -520,6 +530,8 @@ body {
       item.el.querySelector('.checkmark').classList.add('shown');
       step++;
       updateHUD();
+      // Crossfade dog to intermediate state for steps 1 and 2
+      if (step < 3) crossfadeDog(DOG_STATES[step]);
       busy = false;
       if (step === 3) setTimeout(completeAll, 420);
     });
@@ -569,6 +581,14 @@ body {
   function updateHUD() {
     progressText.textContent = 'PREP: ' + step + ' / 3';
     progressFill.style.width = (step / 3 * 100) + '%';
+  }
+
+  // ── Dog crossfade ─────────────────────────────────────────────────
+  function crossfadeDog(toEl) {
+    if (activeDog === toEl) return;
+    activeDog.style.opacity = '0';
+    toEl.style.opacity      = '1';
+    activeDog = toEl;
   }
 
   // ══════════════════════════════════════════════════════════════════
@@ -692,8 +712,7 @@ body {
     sadCloud.style.opacity = '0';
     fireStars();
     setTimeout(() => {
-      dogSad.style.opacity   = '0';
-      dogHappy.style.opacity = '1';
+      crossfadeDog(dogHappy);
       setTimeout(moveDogToOcean, 900);
     }, 1100);
   }
@@ -780,8 +799,9 @@ body {
     dogContainer.style.animation  = 'none';
     dogContainer.style.bottom     = '18%';
     dogContainer.style.left       = '50%';
-    dogSad.style.opacity   = '1';
-    dogHappy.style.opacity = '0';
+    DOG_STATES.forEach(d => { d.style.opacity = '0'; });
+    dogSad.style.opacity = '1';
+    activeDog = dogSad;
 
     sadCloud.style.opacity = '1';
     starBurst.innerHTML    = '';
