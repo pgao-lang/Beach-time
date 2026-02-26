@@ -206,6 +206,35 @@ body {
 #itemSunCream { bottom: 4%;  left: 50%; transform: translateX(-50%); }
 #itemSwimRing { bottom: 20%; right: 5%; }
 
+/* ── Swim-ring drag interaction ─────────────────── */
+#itemSwimRing          { cursor: grab; }
+#itemSwimRing.dragging { opacity: 0.25 !important; cursor: grabbing; }
+
+/* Glow the dog when a dragged item is hovering over it */
+#dogContainer.drop-glow {
+  filter: drop-shadow(0 0 24px rgba(255, 220, 0, 1))
+          drop-shadow(0 0 10px rgba(255, 180, 0, 0.85));
+}
+
+/* Small label beneath the swim ring to signal "drag me" */
+.drag-hint {
+  position: absolute;
+  bottom: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.52);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+#itemSwimRing.used .drag-hint { display: none; }
+
 /* ── Hint text ──────────────────────────────────── */
 #hintText {
   position: absolute;
@@ -366,6 +395,7 @@ body {
   <div id="itemSwimRing" class="sand-item">
     <img src="swim-ring.png" alt="Swim Ring">
     <div class="checkmark">&#10003;</div>
+    <div class="drag-hint">drag to dog ↑</div>
   </div>
 
   <!-- ── Dog container ── -->
@@ -414,10 +444,16 @@ body {
   'use strict';
 
   // ── State ─────────────────────────────────────────────────────────
-  let step     = 0;
-  let busy     = false;
-  let endShown = false;
+  let step      = 0;
+  let busy      = false;
+  let endShown  = false;
   let hintTimer = null;
+
+  // ── Drag state (swim ring) ─────────────────────────────────────────
+  let dragActive = false;
+  let dragClone  = null;
+  let dragOX     = 0;
+  let dragOY     = 0;
 
   // ── Elements ──────────────────────────────────────────────────────
   const dogContainer = document.getElementById('dogContainer');
@@ -446,11 +482,16 @@ body {
 
   // ── Init ──────────────────────────────────────────────────────────
   function init() {
-    ITEMS.forEach(item => item.el.addEventListener('click', () => onItemClick(item)));
+    // Juice and sun-cream: click interaction
+    ITEMS.slice(0, 2).forEach(item =>
+      item.el.addEventListener('click', () => onItemClick(item))
+    );
+    // Swim ring: drag interaction
+    initRingDrag();
     endOverlay.addEventListener('click', restart);
   }
 
-  // ── Click ─────────────────────────────────────────────────────────
+  // ── Click (juice & sun-cream) ─────────────────────────────────────
   function onItemClick(item) {
     if (busy || endShown) return;
     if (item.el.classList.contains('used')) return;
@@ -458,7 +499,7 @@ body {
     else                       wrongItem(item);
   }
 
-  // ── Wrong order ───────────────────────────────────────────────────
+  // ── Wrong order feedback ──────────────────────────────────────────
   function wrongItem(item) {
     item.el.classList.remove('shake', 'shakeCentered');
     void item.el.offsetWidth;
@@ -530,6 +571,121 @@ body {
     progressFill.style.width = (step / 3 * 100) + '%';
   }
 
+  // ══════════════════════════════════════════════════════════════════
+  // ── Swim-ring drag logic ──────────────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════
+
+  function initRingDrag() {
+    itemSwimRing.addEventListener('mousedown',  onRingPointerDown);
+    itemSwimRing.addEventListener('touchstart', onRingTouchStart, { passive: false });
+  }
+
+  // ── pointer-down / touch-start ────────────────────────────────────
+  function onRingPointerDown(e) {
+    if (busy || endShown || itemSwimRing.classList.contains('used')) return;
+    e.preventDefault();
+    beginDrag(e.clientX, e.clientY);
+    document.addEventListener('mousemove', onRingPointerMove);
+    document.addEventListener('mouseup',   onRingPointerUp);
+  }
+
+  function onRingTouchStart(e) {
+    if (busy || endShown || itemSwimRing.classList.contains('used')) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    beginDrag(t.clientX, t.clientY);
+    document.addEventListener('touchmove', onRingTouchMove, { passive: false });
+    document.addEventListener('touchend',  onRingTouchEnd);
+  }
+
+  // ── begin: spawn floating clone ───────────────────────────────────
+  function beginDrag(cx, cy) {
+    const rect  = itemSwimRing.getBoundingClientRect();
+    const imgEl = itemSwimRing.querySelector('img');
+
+    dragClone = document.createElement('img');
+    dragClone.src = imgEl.currentSrc || imgEl.src;
+    dragClone.style.cssText =
+      'position:fixed;'
+      + 'width:' + rect.width + 'px;height:' + rect.height + 'px;'
+      + 'object-fit:contain;pointer-events:none;z-index:500;'
+      + 'opacity:0.92;left:' + rect.left + 'px;top:' + rect.top + 'px;'
+      + 'transition:none;';
+    document.body.appendChild(dragClone);
+
+    dragOX     = cx - rect.left;
+    dragOY     = cy - rect.top;
+    dragActive = true;
+
+    itemSwimRing.classList.add('dragging');
+  }
+
+  // ── move ──────────────────────────────────────────────────────────
+  function moveDrag(cx, cy) {
+    if (!dragActive || !dragClone) return;
+    dragClone.style.left = (cx - dragOX) + 'px';
+    dragClone.style.top  = (cy - dragOY) + 'px';
+
+    // Glow dog when the clone hovers over it
+    const dr   = dogContainer.getBoundingClientRect();
+    const over = cx >= dr.left && cx <= dr.right
+              && cy >= dr.top  && cy <= dr.bottom;
+    dogContainer.classList.toggle('drop-glow', over);
+  }
+
+  // ── end: drop or snap-back ────────────────────────────────────────
+  function endDrag(cx, cy) {
+    if (!dragActive) return;
+    dragActive = false;
+
+    document.removeEventListener('mousemove', onRingPointerMove);
+    document.removeEventListener('mouseup',   onRingPointerUp);
+    document.removeEventListener('touchmove', onRingTouchMove);
+    document.removeEventListener('touchend',  onRingTouchEnd);
+
+    dogContainer.classList.remove('drop-glow');
+
+    const dr       = dogContainer.getBoundingClientRect();
+    const onDog    = cx >= dr.left && cx <= dr.right
+                  && cy >= dr.top  && cy <= dr.bottom;
+    const ringItem = ITEMS[2];
+
+    if (onDog) {
+      // Released on dog ─ evaluate step
+      removeDragClone();
+      itemSwimRing.classList.remove('dragging');
+      if (ringItem.stepIdx === step) {
+        applyItem(ringItem);
+      } else {
+        wrongItem(ringItem);
+      }
+    } else {
+      // Released elsewhere ─ animate clone back then restore
+      const rect = itemSwimRing.getBoundingClientRect();
+      dragClone.style.transition = 'left .32s ease, top .32s ease, opacity .32s ease';
+      dragClone.style.left    = rect.left + 'px';
+      dragClone.style.top     = rect.top  + 'px';
+      dragClone.style.opacity = '0';
+      setTimeout(() => {
+        removeDragClone();
+        itemSwimRing.classList.remove('dragging');
+      }, 340);
+    }
+  }
+
+  // ── helpers ───────────────────────────────────────────────────────
+  function removeDragClone() {
+    if (dragClone && dragClone.parentNode) dragClone.parentNode.removeChild(dragClone);
+    dragClone = null;
+  }
+
+  function onRingPointerMove(e) { moveDrag(e.clientX, e.clientY); }
+  function onRingPointerUp(e)   { endDrag(e.clientX, e.clientY); }
+  function onRingTouchMove(e)   { e.preventDefault(); const t = e.touches[0]; moveDrag(t.clientX, t.clientY); }
+  function onRingTouchEnd(e)    { const t = e.changedTouches[0]; endDrag(t.clientX, t.clientY); }
+
+  // ══════════════════════════════════════════════════════════════════
+
   // ── All 3 applied ─────────────────────────────────────────────────
   function completeAll() {
     busy = true;
@@ -545,17 +701,14 @@ body {
   // ── Stars ─────────────────────────────────────────────────────────
   function fireStars() {
     starBurst.innerHTML = '';
-    const pal  = ['#FFD700','#FF6B6B','#7ECEF6','#98FB98','#FF69B4','#FFA500'];
-    const spots = [
-      '8% 50%','25% 12%','50% 55%','74% 10%','92% 48%',
-      '18% 82%','50% 0%','82% 80%'
-    ];
+    const pal   = ['#FFD700','#FF6B6B','#7ECEF6','#98FB98','#FF69B4','#FFA500'];
+    const spots = ['8% 50%','25% 12%','50% 55%','74% 10%','92% 48%','18% 82%','50% 0%','82% 80%'];
     spots.forEach((pos, i) => {
       const [l, t] = pos.split(' ');
       const s = document.createElement('div');
       s.className = 'star';
       s.style.cssText = 'left:' + l + ';top:' + t
-        + ';width:' + (9 + (i % 4) * 3) + 'px'
+        + ';width:'  + (9 + (i % 4) * 3) + 'px'
         + ';height:' + (9 + (i % 4) * 3) + 'px'
         + ';background:' + pal[i % pal.length]
         + ';animation-delay:' + (i * 0.09) + 's';
@@ -585,24 +738,18 @@ body {
     const cy = r.bottom - r.height * 0.22;
 
     Object.assign(splash.style, {
-      left:   (cx - 65) + 'px',
-      top:    (cy - 32) + 'px',
-      width:  '130px',
-      height: '65px',
-      opacity:'1',
+      left: (cx - 65) + 'px', top: (cy - 32) + 'px',
+      width: '130px', height: '65px', opacity: '1',
     });
     splash.innerHTML = '';
 
-    [
-      [10, 42, 19, 0],    [30, 0,  26, 0.07],
-      [50, 52, 21, 0.04], [65, 5,  32, 0.1 ],
-      [82, 38, 17, 0.03], [44,-22, 23, 0.06],
-    ].forEach(([l, t, sz, d]) => {
-      const dr = document.createElement('div');
-      dr.className = 'splash-drop';
-      dr.style.cssText = 'left:' + l + '%;top:' + t + '%;width:' + sz + 'px;height:' + sz + 'px;animation-delay:' + d + 's';
-      splash.appendChild(dr);
-    });
+    [[10,42,19,0],[30,0,26,0.07],[50,52,21,0.04],[65,5,32,0.1],[82,38,17,0.03],[44,-22,23,0.06]]
+      .forEach(([l, t, sz, d]) => {
+        const dr = document.createElement('div');
+        dr.className = 'splash-drop';
+        dr.style.cssText = 'left:' + l + '%;top:' + t + '%;width:' + sz + 'px;height:' + sz + 'px;animation-delay:' + d + 's';
+        splash.appendChild(dr);
+      });
 
     setTimeout(() => { splash.innerHTML = ''; }, 1400);
   }
@@ -616,6 +763,12 @@ body {
 
   // ── Restart ───────────────────────────────────────────────────────
   function restart() {
+    // Cancel any live drag first
+    dragActive = false;
+    removeDragClone();
+    itemSwimRing.classList.remove('dragging');
+    dogContainer.classList.remove('drop-glow');
+
     step     = 0;
     busy     = false;
     endShown = false;
