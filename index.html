@@ -112,14 +112,23 @@ body {
 
 #equipSwimRing {
   position: absolute;
-  width: 110%;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: -12%;
+  width:  clamp(120px, 15vw, 190px);
+  height: clamp(120px, 15vw, 190px);
+  bottom: 57%;
+  left: 62%;
   opacity: 0;
   object-fit: contain;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.6s ease;
   pointer-events: none;
+}
+
+#equipSwimRing.floating {
+  animation: swimRingBob 2.4s ease-in-out infinite;
+}
+
+@keyframes swimRingBob {
+  0%, 100% { transform: translateY(0px)   rotate(-4deg); }
+  50%       { transform: translateY(-10px) rotate(4deg); }
 }
 
 /* ── Sad cloud ──────────────────────────────────── */
@@ -411,7 +420,6 @@ body {
     <!-- Equipped overlays -->
     <img id="equipJuice"    src="juice.png"     alt="">
     <img id="equipSunCream" src="sun-cream.png" alt="">
-    <img id="equipSwimRing" src="swim-ring.png" alt="">
 
     <!-- Sad cloud SVG -->
     <div id="sadCloud">
@@ -427,6 +435,9 @@ body {
     <div id="starBurst"></div>
 
   </div><!-- /dogContainer -->
+
+  <!-- Swim ring floating on sea (shown after dog reaches ocean) -->
+  <img id="equipSwimRing" src="swim-ring.png" alt="">
 
   <!-- Splash anchor (positioned by JS) -->
   <div id="splash" style="position:fixed;pointer-events:none;z-index:160;"></div>
@@ -525,7 +536,8 @@ body {
   function applyItem(item) {
     busy = true;
     flyToDog(item, () => {
-      item.equip.style.opacity = '1';
+      // Swim ring equip is shown floating on the sea later, not on the dog
+      if (item.stepIdx !== 2) item.equip.style.opacity = '1';
       item.el.classList.add('used');
       item.el.querySelector('.checkmark').classList.add('shown');
       step++;
@@ -742,6 +754,8 @@ body {
     dogContainer.style.bottom = '58%';
     setTimeout(() => {
       showSplash();
+      equipSwimRing.style.opacity = '1';
+      equipSwimRing.classList.add('floating');
       setTimeout(() => {
         dogContainer.style.transition = 'none';
         dogContainer.style.animation  = 'dogBob 1.6s ease-in-out infinite';
@@ -815,6 +829,7 @@ body {
       item.el.querySelector('.checkmark').classList.remove('shown');
       item.equip.style.opacity = '0';
     });
+    equipSwimRing.classList.remove('floating');
   }
 
   init();
