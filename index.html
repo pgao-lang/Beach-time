@@ -1131,18 +1131,12 @@ body {
       item.el.querySelector('.checkmark').classList.add('shown');
       step++;
       updateHUD();
-      // Crossfade dog to intermediate state for steps 1 and 2
-      if (step < 3) crossfadeDog(DOG_STATES[step]);
+      // Crossfade dog: steps 1–2 to intermediate states, step 3 directly to happy
+      if (step <= 3) crossfadeDog(DOG_STATES[step]);
       // After juice applied: show heat bubble
       if (step === 1) {
         dogBubble.textContent = 'The sun is very hot today.';
         void dogBubble.offsetWidth; // force reflow to restart animation
-        dogBubble.classList.add('visible');
-      }
-      // After sun-cream applied: show swim-ring bubble
-      if (step === 2) {
-        dogBubble.textContent = 'That swim ring looks pretty!';
-        void dogBubble.offsetWidth;
         dogBubble.classList.add('visible');
       }
       busy = false;
@@ -1251,6 +1245,15 @@ body {
     dragActive = true;
 
     itemSwimRing.classList.add('dragging');
+
+    // At step 2: show dialog, ensure sad dog stays hidden, dim target dog
+    if (step === 2) {
+      dogSad.style.opacity = '0';
+      dogJuiceCream.style.opacity = '0.35';
+      dogBubble.textContent = 'That swim ring looks pretty!';
+      void dogBubble.offsetWidth;
+      dogBubble.classList.add('visible');
+    }
   }
 
   // ── move ──────────────────────────────────────────────────────────
@@ -1296,6 +1299,10 @@ body {
       }
     } else {
       // Released elsewhere ─ animate clone back then restore
+      if (step === 2) {
+        dogJuiceCream.style.opacity = '1'; // restore drop-target visibility
+        dogBubble.classList.remove('visible');
+      }
       const rect = itemSwimRing.getBoundingClientRect();
       dragClone.style.transition = 'left .32s ease, top .32s ease, opacity .32s ease';
       dragClone.style.left    = rect.left + 'px';
