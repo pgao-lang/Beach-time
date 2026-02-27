@@ -639,7 +639,13 @@ body {
 #doorScene.open #doorDog {
   pointer-events: all;
   cursor: grab;
-  animation: none;
+  animation: dogOpenNudge 2.4s ease-in-out infinite;
+}
+
+@keyframes dogOpenNudge {
+  0%,  38%, 100% { transform: translate(0,     0)    rotate(0deg);  }
+  14%             { transform: translate(-22px, -9px) rotate(-7deg); }
+  26%             { transform: translate(-6px,  -2px) rotate(-2deg); }
 }
 
 #doorScene.open #doorDog:active {
@@ -665,28 +671,6 @@ body {
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* Drag hint shown after door opens */
-#doorDragHint {
-  position: absolute;
-  bottom: 7%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.58);
-  color: #fff;
-  padding: 7px 18px;
-  border-radius: 20px;
-  font-size: clamp(11px, 1.5vw, 14px);
-  font-weight: 700;
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.4s ease 0.5s;
-}
-
-#doorScene.open #doorDragHint {
-  opacity: 1;
-}
 
 /* ── Door click hint (pulse tap indicator) ────────── */
 #doorClickHint {
@@ -893,7 +877,6 @@ body {
   <!-- Door scene (shown after clicking start, before beach game) -->
   <div id="doorScene" class="hidden">
     <div id="doorDropZone"></div>
-    <div id="doorDragHint">drag the dog through the door!</div>
     <!-- Click hint: pulsing tap indicator on the closed door -->
     <div id="doorClickHint">
       <div class="tap-dot">
@@ -1045,7 +1028,8 @@ body {
       + 'left:'  + rect.left   + 'px;'
       + 'top:'   + rect.top    + 'px;';
     document.body.appendChild(dogDragClone);
-    doorDog.style.opacity = '0.3';
+    doorDog.style.animation = 'none'; // stop nudge hint while dragging
+    doorDog.style.opacity   = '0.3';
   }
 
   function onDogDragMove(e)      { moveDogDrag(e.clientX, e.clientY); }
@@ -1090,7 +1074,11 @@ body {
       dogDragClone.style.left    = orig.left + 'px';
       dogDragClone.style.top     = orig.top  + 'px';
       dogDragClone.style.opacity = '0';
-      setTimeout(() => { removeDogDragClone(); doorDog.style.opacity = '1'; }, 320);
+      setTimeout(() => {
+        removeDogDragClone();
+        doorDog.style.opacity   = '1';
+        doorDog.style.animation = ''; // re-enable nudge hint (CSS rule takes over)
+      }, 320);
     }
   }
 
