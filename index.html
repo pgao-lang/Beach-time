@@ -600,13 +600,30 @@ body {
   cursor: pointer;
 }
 
+/* open-door.png fades in over the closed door */
+#doorScene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('open-door.png') center / cover no-repeat;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+#doorScene.open::before {
+  opacity: 1;
+}
+
 #doorScene.hidden {
   opacity: 0;
   pointer-events: none;
 }
 
 #doorScene #doorDog {
-  width: clamp(160px, 22vw, 300px);
+  position: relative;
+  z-index: 1;
+  width: clamp(260px, 34vw, 480px);
   height: auto;
   margin-right: clamp(20px, 5vw, 80px);
   margin-bottom: clamp(10px, 3vh, 50px);
@@ -833,7 +850,7 @@ body {
     initRingDrag();
     endOverlay.addEventListener('click', restart);
     startBtn.addEventListener('click', startGame);
-    doorScene.addEventListener('click', dismissDoorScene);
+    doorScene.addEventListener('click', onDoorClick);
   }
 
   // ── Start game ────────────────────────────────────────────────────
@@ -843,10 +860,16 @@ body {
     doorScene.classList.remove('hidden');
   }
 
-  function dismissDoorScene() {
-    doorScene.classList.add('hidden');
-    busy = false;
-    dogBubble.classList.add('visible');
+  function onDoorClick() {
+    if (!doorScene.classList.contains('open')) {
+      // First click: open the door
+      doorScene.classList.add('open');
+    } else {
+      // Second click: proceed to beach game
+      doorScene.classList.add('hidden');
+      busy = false;
+      dogBubble.classList.add('visible');
+    }
   }
 
   // ── Click (juice & sun-cream) ─────────────────────────────────────
@@ -1236,6 +1259,7 @@ body {
     goldParticles.innerHTML = '';
     dogBubble.textContent = "I'm thirsty";
     dogBubble.classList.add('visible');
+    doorScene.classList.remove('open');
   }
 
   init();
