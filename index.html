@@ -334,18 +334,69 @@ body {
   50%     { transform: translateX(-50%) translateY(-10px); }
 }
 
+/* ── Gold shine (rotating rays behind gold) ──────── */
+#goldShine {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: clamp(360px, 50vw, 620px);
+  height: clamp(360px, 50vw, 620px);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,245,150,0.65) 0%, rgba(255,210,0,0.25) 35%, transparent 65%),
+    conic-gradient(
+      from 0deg,
+      transparent 0deg,   rgba(255,225,0,0.55) 10deg,  transparent 20deg,
+      transparent 45deg,  rgba(255,205,60,0.45) 55deg,  transparent 65deg,
+      transparent 90deg,  rgba(255,225,0,0.55) 100deg, transparent 110deg,
+      transparent 135deg, rgba(255,205,60,0.45) 145deg, transparent 155deg,
+      transparent 180deg, rgba(255,225,0,0.55) 190deg, transparent 200deg,
+      transparent 225deg, rgba(255,205,60,0.45) 235deg, transparent 245deg,
+      transparent 270deg, rgba(255,225,0,0.55) 280deg, transparent 290deg,
+      transparent 315deg, rgba(255,205,60,0.45) 325deg, transparent 335deg,
+      transparent 360deg
+    );
+  pointer-events: none;
+  z-index: 349;
+  opacity: 0;
+}
+
+#goldShine.active {
+  animation:
+    shineIn      0.5s ease             forwards,
+    shineRotate  6s   0.5s linear      infinite,
+    shineGlitter 1.5s 0.4s ease-in-out infinite;
+}
+
+@keyframes shineIn {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes shineRotate {
+  from { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) scale(1) rotate(360deg); }
+}
+
+@keyframes shineGlitter {
+  0%, 100% { filter: brightness(1)   saturate(1); }
+  30%       { filter: brightness(1.6) saturate(1.4); }
+  70%       { filter: brightness(1.2) saturate(1.1); }
+}
+
 /* ── Gold award ─────────────────────────────────── */
 #goldAward {
   position: absolute;
-  bottom: 19%;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%) scale(0);
-  width: clamp(140px, 18vw, 220px);
-  height: clamp(140px, 18vw, 220px);
+  transform: translate(-50%, -50%) scale(0);
+  width: clamp(180px, 24vw, 300px);
+  height: clamp(180px, 24vw, 300px);
   object-fit: contain;
   opacity: 0;
   pointer-events: none;
-  z-index: 200;
+  z-index: 350;
   transition: none;
 }
 
@@ -356,25 +407,25 @@ body {
 }
 
 @keyframes goldPopBounce {
-  0%   { opacity: 0; transform: translateX(-50%) scale(0.2) translateY(20px); animation-timing-function: ease-out; }
-  53%  { opacity: 1; transform: translateX(-50%) scale(1.1) translateY(-6px);  animation-timing-function: ease-in-out; }
-  100% { opacity: 1; transform: translateX(-50%) scale(1.0) translateY(0px); }
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.2) translateY(20px); animation-timing-function: ease-out; }
+  53%  { opacity: 1; transform: translate(-50%, -50%) scale(1.1) translateY(-6px);  animation-timing-function: ease-in-out; }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.0) translateY(0px); }
 }
 
 @keyframes goldGlowPulse {
-  0%, 100% { filter: drop-shadow(0 0 6px rgba(255,210,0,0.6)) drop-shadow(0 0 14px rgba(255,140,0,0.4)); }
-  50%       { filter: drop-shadow(0 0 22px rgba(255,210,0,1))  drop-shadow(0 0 40px rgba(255,140,0,0.9)); }
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(255,210,0,0.7)) drop-shadow(0 0 18px rgba(255,140,0,0.5)); }
+  50%       { filter: drop-shadow(0 0 26px rgba(255,210,0,1))  drop-shadow(0 0 50px rgba(255,140,0,1)); }
 }
 
 /* ── Gold particles ─────────────────────────────── */
 #goldParticles {
   position: absolute;
-  bottom: 22%;
+  top: 50%;
   left: 50%;
   width: 0;
   height: 0;
   pointer-events: none;
-  z-index: 201;
+  z-index: 351;
 }
 
 .gold-sparkle {
@@ -580,7 +631,8 @@ body {
   <!-- Splash anchor (positioned by JS) -->
   <div id="splash" style="position:fixed;pointer-events:none;z-index:160;"></div>
 
-  <!-- Gold award + particle container -->
+  <!-- Gold shine + award + particle container -->
+  <div id="goldShine"></div>
   <img id="goldAward" src="gold.png" alt="Gold Award">
   <div id="goldParticles"></div>
 
@@ -643,6 +695,7 @@ body {
   const equipJuice   = document.getElementById('equipJuice');
   const equipSunCream= document.getElementById('equipSunCream');
   const equipSwimRing= document.getElementById('equipSwimRing');
+  const goldShine    = document.getElementById('goldShine');
   const goldAward    = document.getElementById('goldAward');
   const goldParticles= document.getElementById('goldParticles');
   const startOverlay = document.getElementById('startOverlay');
@@ -894,6 +947,7 @@ body {
 
   // ── Gold reward ───────────────────────────────────────
   function showGoldReward() {
+    goldShine.classList.add('active');
     goldAward.classList.add('pop');
     emitGoldParticles();
   }
@@ -1037,6 +1091,7 @@ body {
       item.equip.style.opacity = '0';
     });
     equipSwimRing.classList.remove('floating');
+    goldShine.classList.remove('active');
     goldAward.classList.remove('pop');
     goldParticles.innerHTML = '';
   }
