@@ -688,6 +688,86 @@ body {
   opacity: 1;
 }
 
+/* ── Door click hint (pulse tap indicator) ────────── */
+#doorClickHint {
+  position: absolute;
+  top: 44%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  pointer-events: none;
+  z-index: 5;
+  animation: hintAppear 0.6s 1.2s both;
+}
+
+/* hide once door is open */
+#doorScene.open #doorClickHint {
+  display: none;
+}
+
+/* central tap dot */
+#doorClickHint .tap-dot {
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+
+#doorClickHint .tap-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255,255,255,0.8);
+}
+
+/* two expanding rings staggered */
+#doorClickHint .ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: tapRipple 1.8s ease-out infinite;
+}
+
+#doorClickHint .ring.r2 { animation-delay: 0.7s; }
+#doorClickHint .ring.r3 { animation-delay: 1.4s; }
+
+/* label */
+#doorClickHint .tap-label {
+  background: rgba(0, 0, 0, 0.62);
+  color: #fff;
+  padding: 5px 14px;
+  border-radius: 16px;
+  font-size: clamp(11px, 1.4vw, 13px);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  animation: labelBob 1.4s ease-in-out infinite;
+}
+
+@keyframes tapRipple {
+  0%   { width: 16px;  height: 16px;  opacity: 0.85; }
+  100% { width: 100px; height: 100px; opacity: 0;    }
+}
+
+@keyframes labelBob {
+  0%, 100% { transform: translateY(0);   }
+  50%       { transform: translateY(-5px); }
+}
+
+@keyframes hintAppear {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1);   }
+}
+
 @keyframes dogIdle {
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-8px); }
@@ -833,6 +913,15 @@ body {
   <div id="doorScene" class="hidden">
     <div id="doorDropZone"></div>
     <div id="doorDragHint">drag the dog through the door!</div>
+    <!-- Click hint: pulsing tap indicator on the closed door -->
+    <div id="doorClickHint">
+      <div class="tap-dot">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="ring r3"></div>
+      </div>
+      <span class="tap-label">click the door!</span>
+    </div>
     <img id="doorDog" src="dog.png" alt="Dog">
   </div>
 
