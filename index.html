@@ -218,7 +218,7 @@ body {
 #itemSwimRing { bottom: 20%; right: 5%; }
 
 /* ── Swim-ring drag interaction ─────────────────── */
-#itemSwimRing          { cursor: grab; }
+#itemSwimRing          { cursor: grab; touch-action: none; user-select: none; }
 #itemSwimRing.dragging { opacity: 0.25 !important; cursor: grabbing; }
 
 /* Glow the dog when a dragged item is hovering over it */
@@ -697,7 +697,6 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
   pointer-events: none;
   z-index: 5;
   animation: hintAppear 0.6s 1.2s both;
@@ -740,27 +739,9 @@ body {
 #doorClickHint .ring.r2 { animation-delay: 0.7s; }
 #doorClickHint .ring.r3 { animation-delay: 1.4s; }
 
-/* label */
-#doorClickHint .tap-label {
-  background: rgba(0, 0, 0, 0.62);
-  color: #fff;
-  padding: 5px 14px;
-  border-radius: 16px;
-  font-size: clamp(11px, 1.4vw, 13px);
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  white-space: nowrap;
-  animation: labelBob 1.4s ease-in-out infinite;
-}
-
 @keyframes tapRipple {
   0%   { width: 16px;  height: 16px;  opacity: 0.85; }
   100% { width: 100px; height: 100px; opacity: 0;    }
-}
-
-@keyframes labelBob {
-  0%, 100% { transform: translateY(0);   }
-  50%       { transform: translateY(-5px); }
 }
 
 @keyframes hintAppear {
@@ -920,7 +901,6 @@ body {
         <div class="ring r2"></div>
         <div class="ring r3"></div>
       </div>
-      <span class="tap-label">click the door!</span>
     </div>
     <img id="doorDog" src="dog.png" alt="Dog">
   </div>
@@ -1279,10 +1259,11 @@ body {
     dragClone.style.left = (cx - dragOX) + 'px';
     dragClone.style.top  = (cy - dragOY) + 'px';
 
-    // Glow dog when the clone hovers over it
+    // Glow dog when the clone hovers over it (32 px tolerance for easier targeting)
     const dr   = dogContainer.getBoundingClientRect();
-    const over = cx >= dr.left && cx <= dr.right
-              && cy >= dr.top  && cy <= dr.bottom;
+    const HIT  = 32;
+    const over = cx >= dr.left - HIT && cx <= dr.right  + HIT
+              && cy >= dr.top  - HIT && cy <= dr.bottom + HIT;
     dogContainer.classList.toggle('drop-glow', over);
   }
 
@@ -1299,8 +1280,9 @@ body {
     dogContainer.classList.remove('drop-glow');
 
     const dr       = dogContainer.getBoundingClientRect();
-    const onDog    = cx >= dr.left && cx <= dr.right
-                  && cy >= dr.top  && cy <= dr.bottom;
+    const HIT      = 32;
+    const onDog    = cx >= dr.left - HIT && cx <= dr.right  + HIT
+                  && cy >= dr.top  - HIT && cy <= dr.bottom + HIT;
     const ringItem = ITEMS[2];
 
     if (onDog) {
