@@ -825,7 +825,8 @@ body {
   // ── Apply correct item ────────────────────────────────────────────
   function applyItem(item) {
     busy = true;
-    if (item.stepIdx === 0) dogBubble.classList.remove('visible');
+    // Hide active bubble immediately on any valid click
+    if (item.stepIdx === 0 || item.stepIdx === 1) dogBubble.classList.remove('visible');
     flyToDog(item, () => {
       // Swim ring equip is shown floating on the sea later, not on the dog
       if (item.stepIdx !== 2) item.equip.style.opacity = '1';
@@ -835,6 +836,12 @@ body {
       updateHUD();
       // Crossfade dog to intermediate state for steps 1 and 2
       if (step < 3) crossfadeDog(DOG_STATES[step]);
+      // After juice applied: show heat bubble
+      if (step === 1) {
+        dogBubble.textContent = 'The sun is very hot today.';
+        void dogBubble.offsetWidth; // force reflow to restart animation
+        dogBubble.classList.add('visible');
+      }
       busy = false;
       if (step === 3) setTimeout(completeAll, 420);
     });
@@ -1174,6 +1181,7 @@ body {
     goldBackdrop.classList.remove('active');
     goldAward.classList.remove('pop');
     goldParticles.innerHTML = '';
+    dogBubble.textContent = "I'm thirsty";
     dogBubble.classList.add('visible');
   }
 
