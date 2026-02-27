@@ -1110,25 +1110,46 @@ body {
   // ── Apply correct item ────────────────────────────────────────────
   function applyItem(item) {
     busy = true;
-    // Hide active bubble immediately on any valid click/drop
     dogBubble.classList.remove('visible');
-    flyToDog(item, () => {
-      // Swim ring equip is shown floating on the sea later, not on the dog
-      if (item.stepIdx !== 2) item.equip.style.opacity = '1';
+
+    // ── Swim ring: drag-and-drop — immediate swap, no fly animation ───
+    if (item.stepIdx === 2) {
       item.el.classList.add('used');
       item.el.querySelector('.checkmark').classList.add('shown');
       step++;
       updateHUD();
-      // Crossfade dog: step 1→juice, step 2→juice+cream, step 3→happy
-      if (step <= 3) crossfadeDog(DOG_STATES[step]);
-      // After juice applied: show heat bubble
+
+      // Hard instant swap: dog-juice-sun cream → happy-dog (Rule 4)
+      dogJuiceCream.style.transition = 'none';
+      dogHappy.style.transition      = 'none';
+      dogJuiceCream.style.opacity    = '0';
+      dogHappy.style.opacity         = '1';
+      activeDog = dogHappy;
+      // Re-arm CSS transitions for any later crossfades
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        dogJuiceCream.style.transition = '';
+        dogHappy.style.transition      = '';
+      }));
+
+      busy = false;
+      setTimeout(completeAll, 420);
+      return;
+    }
+
+    // ── Juice / sun-cream: click items — fly animation then state change ─
+    flyToDog(item, () => {
+      item.equip.style.opacity = '1';
+      item.el.classList.add('used');
+      item.el.querySelector('.checkmark').classList.add('shown');
+      step++;
+      updateHUD();
+      crossfadeDog(DOG_STATES[step]);        // step 1→dogJuice, step 2→dogJuiceCream
       if (step === 1) {
         dogBubble.textContent = 'The sun is very hot today.';
-        void dogBubble.offsetWidth; // force reflow to restart animation
+        void dogBubble.offsetWidth;
         dogBubble.classList.add('visible');
       }
       busy = false;
-      if (step === 3) setTimeout(completeAll, 420);
     });
   }
 
@@ -1234,10 +1255,10 @@ body {
 
     itemSwimRing.classList.add('dragging');
 
-    // At step 2 (after juice+cream): show dialog, hide sad dog, dim target
+    // At step 2 (after juice+cream): show dialog and keep dog.png hidden.
+    // dogJuiceCream stays at full opacity — it IS the drop target.
     if (step === 2) {
-      dogSad.style.opacity = '0';
-      dogJuiceCream.style.opacity = '0.35';
+      dogSad.style.opacity = '0';          // ensure dog.png never shows
       dogBubble.textContent = 'That swim ring looks pretty!';
       void dogBubble.offsetWidth;
       dogBubble.classList.add('visible');
@@ -1288,7 +1309,6 @@ body {
     } else {
       // Released elsewhere ─ animate clone back then restore
       if (step === 2) {
-        dogJuiceCream.style.opacity = '1'; // restore drop-target visibility
         dogBubble.classList.remove('visible');
       }
       const rect = itemSwimRing.getBoundingClientRect();
