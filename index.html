@@ -335,6 +335,31 @@ body {
   50%     { transform: translateX(-50%) translateY(-10px); }
 }
 
+/* ── Gold award ─────────────────────────────────── */
+#goldAward {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: clamp(160px, 22vw, 280px);
+  height: clamp(160px, 22vw, 280px);
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 250;
+  transition: none;
+}
+
+#goldAward.pop {
+  animation: goldPop 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+
+@keyframes goldPop {
+  0%   { transform: translate(-50%, -50%) scale(0);    opacity: 0; }
+  60%  { transform: translate(-50%, -50%) scale(1.18); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
+}
+
 /* ── End overlay ────────────────────────────────── */
 #endOverlay {
   position: absolute;
@@ -500,6 +525,9 @@ body {
   <!-- Splash anchor (positioned by JS) -->
   <div id="splash" style="position:fixed;pointer-events:none;z-index:160;"></div>
 
+  <!-- Gold award (shown after dog swims) -->
+  <img id="goldAward" src="gold.png" alt="Gold Award">
+
   <!-- Hint text -->
   <div id="hintText">Not yet!</div>
 
@@ -559,6 +587,7 @@ body {
   const equipJuice   = document.getElementById('equipJuice');
   const equipSunCream= document.getElementById('equipSunCream');
   const equipSwimRing= document.getElementById('equipSwimRing');
+  const goldAward    = document.getElementById('goldAward');
   const startOverlay = document.getElementById('startOverlay');
   const startBtn     = document.getElementById('startBtn');
 
@@ -834,7 +863,9 @@ body {
       setTimeout(() => {
         dogContainer.style.transition = 'none';
         dogContainer.style.animation  = 'dogBob 1.6s ease-in-out infinite';
-        showEndScreen();
+        // Show gold award after dog-swim crossfade settles
+        goldAward.classList.add('pop');
+        setTimeout(showEndScreen, 800);
       }, 900);
     }, 1650);
   }
@@ -906,6 +937,7 @@ body {
       item.equip.style.opacity = '0';
     });
     equipSwimRing.classList.remove('floating');
+    goldAward.classList.remove('pop');
   }
 
   init();
