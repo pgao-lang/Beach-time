@@ -825,8 +825,8 @@ body {
   // ── Apply correct item ────────────────────────────────────────────
   function applyItem(item) {
     busy = true;
-    // Hide active bubble immediately on any valid click
-    if (item.stepIdx === 0 || item.stepIdx === 1) dogBubble.classList.remove('visible');
+    // Hide active bubble immediately on any valid click/drop
+    dogBubble.classList.remove('visible');
     flyToDog(item, () => {
       // Swim ring equip is shown floating on the sea later, not on the dog
       if (item.stepIdx !== 2) item.equip.style.opacity = '1';
@@ -840,6 +840,12 @@ body {
       if (step === 1) {
         dogBubble.textContent = 'The sun is very hot today.';
         void dogBubble.offsetWidth; // force reflow to restart animation
+        dogBubble.classList.add('visible');
+      }
+      // After sun-cream applied: show swim-ring bubble
+      if (step === 2) {
+        dogBubble.textContent = 'That swim ring looks pretty!';
+        void dogBubble.offsetWidth;
         dogBubble.classList.add('visible');
       }
       busy = false;
