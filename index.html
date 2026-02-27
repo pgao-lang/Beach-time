@@ -75,7 +75,7 @@ body {
   height: clamp(360px, 46vw, 580px);
 }
 
-#dogSad, #dogJuice, #dogJuiceCream, #dogHappy, #dogSwim {
+#dogSad, #dogJuice, #dogJuiceCream, #dogHappy {
   position: absolute;
   top: 0; left: 0;
   width: 100%; height: 100%;
@@ -85,8 +85,7 @@ body {
 
 #dogJuice,
 #dogJuiceCream,
-#dogHappy,
-#dogSwim { opacity: 0; }
+#dogHappy { opacity: 0; }
 
 /* ── Equipped overlays ──────────────────────────── */
 #equipJuice {
@@ -498,7 +497,6 @@ body {
     <img id="dogJuice"      src="dog-juice.png"            alt="Dog with Juice">
     <img id="dogJuiceCream" src="dog-juice-sun cream.png"  alt="Dog with Juice and Sun Cream">
     <img id="dogHappy"      src="happy-dog.png"            alt="Happy Dog">
-    <img id="dogSwim"       src="dog-swim_.png"            alt="Dog Swimming">
 
     <!-- Equipped overlays -->
     <img id="equipJuice"    src="juice.png"     alt="">
@@ -568,7 +566,6 @@ body {
   const dogJuice      = document.getElementById('dogJuice');
   const dogJuiceCream = document.getElementById('dogJuiceCream');
   const dogHappy      = document.getElementById('dogHappy');
-  const dogSwim       = document.getElementById('dogSwim');
   const sadCloud      = document.getElementById('sadCloud');
 
   // Intermediate dog states indexed by step count (0–3)
@@ -859,7 +856,6 @@ body {
       showSplash();
       equipSwimRing.style.opacity = '1';
       equipSwimRing.classList.add('floating');
-      crossfadeDog(dogSwim);
       setTimeout(() => {
         dogContainer.style.transition = 'none';
         dogContainer.style.animation  = 'dogBob 1.6s ease-in-out infinite';
@@ -920,8 +916,7 @@ body {
     dogContainer.style.bottom     = '18%';
     dogContainer.style.left       = '50%';
     DOG_STATES.forEach(d => { d.style.opacity = '0'; });
-    dogSwim.style.opacity = '0';
-    dogSad.style.opacity  = '1';
+    dogSad.style.opacity = '1';
     activeDog = dogSad;
 
     sadCloud.style.opacity = '1';
