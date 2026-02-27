@@ -246,6 +246,53 @@ body {
 }
 #itemSwimRing.used .drag-hint { display: none; }
 
+/* ── Dog speech bubble ───────────────────────────── */
+#dogBubble {
+  position: absolute;
+  top: 8%;
+  left: 54%;
+  background: #fff;
+  color: #333;
+  padding: 8px 16px;
+  border-radius: 18px;
+  font-size: clamp(11px, 1.5vw, 14px);
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.2);
+  pointer-events: none;
+  z-index: 90;
+  opacity: 0;
+}
+
+/* tail pointing left toward the dog */
+#dogBubble::after {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 11px solid #fff;
+}
+
+#dogBubble.visible {
+  animation:
+    bubblePop   0.4s cubic-bezier(0.68,-0.55,0.27,1.55) forwards,
+    bubbleFloat 2.5s 0.4s ease-in-out infinite;
+}
+
+@keyframes bubblePop {
+  0%   { opacity: 0; transform: scale(0.5); }
+  70%  { transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes bubbleFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-5px); }
+}
+
 /* ── Hint text ──────────────────────────────────── */
 #hintText {
   position: absolute;
@@ -646,6 +693,9 @@ body {
     <!-- Star burst -->
     <div id="starBurst"></div>
 
+    <!-- Speech bubble -->
+    <div id="dogBubble">I'm thirsty</div>
+
   </div><!-- /dogContainer -->
 
   <!-- Swim ring floating on sea (shown after dog reaches ocean) -->
@@ -707,6 +757,7 @@ body {
   const DOG_STATES = [dogSad, dogJuice, dogJuiceCream, dogHappy];
   let activeDog = dogSad;
   const starBurst    = document.getElementById('starBurst');
+  const dogBubble    = document.getElementById('dogBubble');
   const hintText     = document.getElementById('hintText');
   const endOverlay   = document.getElementById('endOverlay');
   const splash       = document.getElementById('splash');
@@ -748,6 +799,7 @@ body {
   function startGame() {
     startOverlay.classList.add('hidden');
     busy = false;
+    dogBubble.classList.add('visible');
   }
 
   // ── Click (juice & sun-cream) ─────────────────────────────────────
@@ -773,6 +825,7 @@ body {
   // ── Apply correct item ────────────────────────────────────────────
   function applyItem(item) {
     busy = true;
+    if (item.stepIdx === 0) dogBubble.classList.remove('visible');
     flyToDog(item, () => {
       // Swim ring equip is shown floating on the sea later, not on the dog
       if (item.stepIdx !== 2) item.equip.style.opacity = '1';
@@ -1121,6 +1174,7 @@ body {
     goldBackdrop.classList.remove('active');
     goldAward.classList.remove('pop');
     goldParticles.innerHTML = '';
+    dogBubble.classList.add('visible');
   }
 
   init();
