@@ -600,6 +600,10 @@ body {
   cursor: pointer;
 }
 
+#doorScene.open {
+  cursor: default;
+}
+
 /* open-door.png fades in over the closed door */
 #doorScene::before {
   content: '';
@@ -629,6 +633,59 @@ body {
   margin-bottom: clamp(10px, 3vh, 50px);
   pointer-events: none;
   animation: dogIdle 2.5s ease-in-out infinite;
+}
+
+/* Dog becomes draggable once the door is open */
+#doorScene.open #doorDog {
+  pointer-events: all;
+  cursor: grab;
+  animation: none;
+}
+
+#doorScene.open #doorDog:active {
+  cursor: grabbing;
+}
+
+/* Invisible drop zone covering the door opening area */
+#doorDropZone {
+  position: absolute;
+  left: 20%;
+  top: 5%;
+  width: 55%;
+  height: 88%;
+  border-radius: 16px;
+  border: 3px dashed transparent;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+#doorDropZone.glow {
+  border-color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Drag hint shown after door opens */
+#doorDragHint {
+  position: absolute;
+  bottom: 7%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.58);
+  color: #fff;
+  padding: 7px 18px;
+  border-radius: 20px;
+  font-size: clamp(11px, 1.5vw, 14px);
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.4s ease 0.5s;
+}
+
+#doorScene.open #doorDragHint {
+  opacity: 1;
 }
 
 @keyframes dogIdle {
@@ -774,6 +831,8 @@ body {
 
   <!-- Door scene (shown after clicking start, before beach game) -->
   <div id="doorScene" class="hidden">
+    <div id="doorDropZone"></div>
+    <div id="doorDragHint">drag the dog through the door!</div>
     <img id="doorDog" src="dog.png" alt="Dog">
   </div>
 
@@ -830,9 +889,18 @@ body {
   const goldBackdrop = document.getElementById('goldBackdrop');
   const goldAward    = document.getElementById('goldAward');
   const goldParticles= document.getElementById('goldParticles');
-  const startOverlay = document.getElementById('startOverlay');
-  const startBtn     = document.getElementById('startBtn');
-  const doorScene    = document.getElementById('doorScene');
+  const startOverlay  = document.getElementById('startOverlay');
+  const startBtn      = document.getElementById('startBtn');
+  const doorScene     = document.getElementById('doorScene');
+  const doorDog       = document.getElementById('doorDog');
+  const doorDropZone  = document.getElementById('doorDropZone');
+
+  // ── Dog-drag state (door scene) ───────────────────────────────────
+  let dogDragActive   = false;
+  let dogDragClone    = null;
+  let dogDragOX       = 0;
+  let dogDragOY       = 0;
+  let dogJustDragged  = false;
 
   const ITEMS = [
     { el: itemJuice,    equip: equipJuice,    stepIdx: 0, centered: false },
@@ -848,6 +916,8 @@ body {
     );
     // Swim ring: drag interaction
     initRingDrag();
+    // Dog drag (door scene)
+    initDoorDogDrag();
     endOverlay.addEventListener('click', restart);
     startBtn.addEventListener('click', startGame);
     doorScene.addEventListener('click', onDoorClick);
@@ -861,15 +931,103 @@ body {
   }
 
   function onDoorClick() {
+    if (dogJustDragged) { dogJustDragged = false; return; }
     if (!doorScene.classList.contains('open')) {
-      // First click: open the door
       doorScene.classList.add('open');
-    } else {
-      // Second click: proceed to beach game
+    }
+    // Door is open: user must drag the dog — plain clicks do nothing
+  }
+
+  // ── Dog drag (door scene) ─────────────────────────────────────────
+  function initDoorDogDrag() {
+    doorDog.addEventListener('mousedown',  onDogDragDown);
+    doorDog.addEventListener('touchstart', onDogDragTouchStart, { passive: false });
+  }
+
+  function onDogDragDown(e) {
+    if (!doorScene.classList.contains('open')) return;
+    e.preventDefault();
+    beginDogDrag(e.clientX, e.clientY);
+    document.addEventListener('mousemove', onDogDragMove);
+    document.addEventListener('mouseup',   onDogDragUp);
+  }
+
+  function onDogDragTouchStart(e) {
+    if (!doorScene.classList.contains('open')) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    beginDogDrag(t.clientX, t.clientY);
+    document.addEventListener('touchmove', onDogDragTouchMove, { passive: false });
+    document.addEventListener('touchend',  onDogDragTouchEnd);
+  }
+
+  function beginDogDrag(cx, cy) {
+    const rect = doorDog.getBoundingClientRect();
+    dogDragOX = cx - rect.left;
+    dogDragOY = cy - rect.top;
+    dogDragActive = true;
+
+    dogDragClone = document.createElement('img');
+    dogDragClone.src = doorDog.src;
+    dogDragClone.style.cssText =
+      'position:fixed;pointer-events:none;z-index:500;opacity:0.92;'
+      + 'width:' + rect.width  + 'px;'
+      + 'height:' + rect.height + 'px;'
+      + 'left:'  + rect.left   + 'px;'
+      + 'top:'   + rect.top    + 'px;';
+    document.body.appendChild(dogDragClone);
+    doorDog.style.opacity = '0.3';
+  }
+
+  function onDogDragMove(e)      { moveDogDrag(e.clientX, e.clientY); }
+  function onDogDragUp(e)        { endDogDrag(e.clientX, e.clientY); }
+  function onDogDragTouchMove(e) { e.preventDefault(); const t = e.touches[0]; moveDogDrag(t.clientX, t.clientY); }
+  function onDogDragTouchEnd(e)  { const t = e.changedTouches[0]; endDogDrag(t.clientX, t.clientY); }
+
+  function moveDogDrag(cx, cy) {
+    if (!dogDragActive || !dogDragClone) return;
+    dogDragClone.style.left = (cx - dogDragOX) + 'px';
+    dogDragClone.style.top  = (cy - dogDragOY) + 'px';
+
+    const dz   = doorDropZone.getBoundingClientRect();
+    const over = cx >= dz.left && cx <= dz.right && cy >= dz.top && cy <= dz.bottom;
+    doorDropZone.classList.toggle('glow', over);
+  }
+
+  function endDogDrag(cx, cy) {
+    if (!dogDragActive) return;
+    dogDragActive  = false;
+    dogJustDragged = true;
+
+    document.removeEventListener('mousemove', onDogDragMove);
+    document.removeEventListener('mouseup',   onDogDragUp);
+    document.removeEventListener('touchmove', onDogDragTouchMove);
+    document.removeEventListener('touchend',  onDogDragTouchEnd);
+    doorDropZone.classList.remove('glow');
+
+    const dz     = doorDropZone.getBoundingClientRect();
+    const onZone = cx >= dz.left && cx <= dz.right && cy >= dz.top && cy <= dz.bottom;
+
+    if (onZone) {
+      removeDogDragClone();
+      doorDog.style.opacity = '1';
       doorScene.classList.add('hidden');
       busy = false;
       dogBubble.classList.add('visible');
+    } else {
+      // Snap clone back to original dog position then restore
+      const orig = doorDog.getBoundingClientRect();
+      dogDragClone.style.transition = 'left .3s ease, top .3s ease, opacity .3s ease';
+      dogDragClone.style.left    = orig.left + 'px';
+      dogDragClone.style.top     = orig.top  + 'px';
+      dogDragClone.style.opacity = '0';
+      setTimeout(() => { removeDogDragClone(); doorDog.style.opacity = '1'; }, 320);
     }
+  }
+
+  function removeDogDragClone() {
+    if (dogDragClone && dogDragClone.parentNode) dogDragClone.parentNode.removeChild(dogDragClone);
+    dogDragClone = null;
   }
 
   // ── Click (juice & sun-cream) ─────────────────────────────────────
