@@ -585,6 +585,40 @@ body {
   100%{ transform: scale(1);    opacity: 1; }
 }
 
+/* ── Door scene ─────────────────────────────────── */
+#doorScene {
+  position: absolute;
+  inset: 0;
+  background: url('close-door.png') center / cover no-repeat;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  opacity: 1;
+  pointer-events: all;
+  transition: opacity 0.6s ease;
+  z-index: 350;
+  cursor: pointer;
+}
+
+#doorScene.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#doorScene #doorDog {
+  width: clamp(160px, 22vw, 300px);
+  height: auto;
+  margin-right: clamp(20px, 5vw, 80px);
+  margin-bottom: clamp(10px, 3vh, 50px);
+  pointer-events: none;
+  animation: dogIdle 2.5s ease-in-out infinite;
+}
+
+@keyframes dogIdle {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
 /* ── Start overlay ──────────────────────────────── */
 #startOverlay {
   position: absolute;
@@ -721,6 +755,11 @@ body {
     <p class="restart-hint">click anywhere to restart</p>
   </div>
 
+  <!-- Door scene (shown after clicking start, before beach game) -->
+  <div id="doorScene" class="hidden">
+    <img id="doorDog" src="dog.png" alt="Dog">
+  </div>
+
   <!-- Start overlay -->
   <div id="startOverlay">
     <h1>Help the puppy to swim!</h1>
@@ -776,6 +815,7 @@ body {
   const goldParticles= document.getElementById('goldParticles');
   const startOverlay = document.getElementById('startOverlay');
   const startBtn     = document.getElementById('startBtn');
+  const doorScene    = document.getElementById('doorScene');
 
   const ITEMS = [
     { el: itemJuice,    equip: equipJuice,    stepIdx: 0, centered: false },
@@ -793,11 +833,18 @@ body {
     initRingDrag();
     endOverlay.addEventListener('click', restart);
     startBtn.addEventListener('click', startGame);
+    doorScene.addEventListener('click', dismissDoorScene);
   }
 
   // ── Start game ────────────────────────────────────────────────────
   function startGame() {
     startOverlay.classList.add('hidden');
+    // Show door scene; beach game starts when user clicks it
+    doorScene.classList.remove('hidden');
+  }
+
+  function dismissDoorScene() {
+    doorScene.classList.add('hidden');
     busy = false;
     dogBubble.classList.add('visible');
   }
