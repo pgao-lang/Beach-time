@@ -205,10 +205,8 @@ body {
   transform: scale(1);
 }
 
-/* Sun cream is no longer a player step — hide it */
-#itemSunCream { display: none; }
-
-/* Swim-ring is larger than juice */
+/* Sun-cream & swim-ring are larger than juice */
+#itemSunCream,
 #itemSwimRing {
   width:  clamp(190px, 24vw, 300px);
   height: clamp(190px, 24vw, 300px);
@@ -216,6 +214,7 @@ body {
 
 /* Item positions — side items pushed to 5% to clear the wider dog */
 #itemJuice    { bottom: 20%; left: 5%; }
+#itemSunCream { bottom: 4%;  left: 50%; transform: translateX(-50%); }
 #itemSwimRing { bottom: 20%; right: 5%; }
 
 /* ── Swim-ring drag interaction ─────────────────── */
@@ -921,8 +920,8 @@ body {
   const dogHappy      = document.getElementById('dogHappy');
   const sadCloud      = document.getElementById('sadCloud');
 
-  // Dog states: step 0 = sad, step 1 = juice+cream (after juice applied), step 2 = happy
-  const DOG_STATES = [dogSad, dogJuiceCream, dogHappy];
+  // Dog states indexed by step: 0=sad, 1=juice, 2=juice+cream, 3=happy
+  const DOG_STATES = [dogSad, dogJuice, dogJuiceCream, dogHappy];
   let activeDog = dogSad;
   const starBurst    = document.getElementById('starBurst');
   const dogBubble    = document.getElementById('dogBubble');
@@ -955,16 +954,16 @@ body {
   let dogDragOY       = 0;
   let dogJustDragged  = false;
 
-  // Sun cream is auto-applied visually (dog-juice-sun cream.png); only juice + swim ring are interactive
   const ITEMS = [
     { el: itemJuice,    equip: equipJuice,    stepIdx: 0, centered: false },
-    { el: itemSwimRing, equip: equipSwimRing,  stepIdx: 1, centered: false },
+    { el: itemSunCream, equip: equipSunCream,  stepIdx: 1, centered: true  },
+    { el: itemSwimRing, equip: equipSwimRing,  stepIdx: 2, centered: false },
   ];
 
   // ── Init ──────────────────────────────────────────────────────────
   function init() {
-    // Juice only: click interaction (swim ring uses drag; sun cream removed from flow)
-    ITEMS.slice(0, 1).forEach(item =>
+    // Juice and sun-cream: click interaction
+    ITEMS.slice(0, 2).forEach(item =>
       item.el.addEventListener('click', () => onItemClick(item))
     );
     // Swim ring: drag interaction
@@ -1115,21 +1114,21 @@ body {
     dogBubble.classList.remove('visible');
     flyToDog(item, () => {
       // Swim ring equip is shown floating on the sea later, not on the dog
-      if (item.stepIdx !== 1) item.equip.style.opacity = '1';
+      if (item.stepIdx !== 2) item.equip.style.opacity = '1';
       item.el.classList.add('used');
       item.el.querySelector('.checkmark').classList.add('shown');
       step++;
       updateHUD();
-      // Crossfade dog: step 1 → dog-juice-sun cream, step 2 → happy-dog
-      if (step <= 2) crossfadeDog(DOG_STATES[step]);
-      // After juice applied: show heat bubble (swim ring drag is now the next action)
+      // Crossfade dog: step 1→juice, step 2→juice+cream, step 3→happy
+      if (step <= 3) crossfadeDog(DOG_STATES[step]);
+      // After juice applied: show heat bubble
       if (step === 1) {
         dogBubble.textContent = 'The sun is very hot today.';
         void dogBubble.offsetWidth; // force reflow to restart animation
         dogBubble.classList.add('visible');
       }
       busy = false;
-      if (step === 2) setTimeout(completeAll, 420);
+      if (step === 3) setTimeout(completeAll, 420);
     });
   }
 
@@ -1175,8 +1174,8 @@ body {
 
   // ── HUD ───────────────────────────────────────────────────────────
   function updateHUD() {
-    progressText.textContent = 'PREP: ' + step + ' / 2';
-    progressFill.style.width = (step / 2 * 100) + '%';
+    progressText.textContent = 'PREP: ' + step + ' / 3';
+    progressFill.style.width = (step / 3 * 100) + '%';
   }
 
   // ── Dog crossfade ─────────────────────────────────────────────────
@@ -1235,8 +1234,8 @@ body {
 
     itemSwimRing.classList.add('dragging');
 
-    // At step 1 (after juice): show dialog, ensure sad dog stays hidden, dim target dog
-    if (step === 1) {
+    // At step 2 (after juice+cream): show dialog, hide sad dog, dim target
+    if (step === 2) {
       dogSad.style.opacity = '0';
       dogJuiceCream.style.opacity = '0.35';
       dogBubble.textContent = 'That swim ring looks pretty!';
@@ -1288,7 +1287,7 @@ body {
       }
     } else {
       // Released elsewhere ─ animate clone back then restore
-      if (step === 1) {
+      if (step === 2) {
         dogJuiceCream.style.opacity = '1'; // restore drop-target visibility
         dogBubble.classList.remove('visible');
       }
@@ -1477,7 +1476,6 @@ body {
       item.el.querySelector('.checkmark').classList.remove('shown');
       item.equip.style.opacity = '0';
     });
-    equipSunCream.style.opacity = '0'; // sun cream not in ITEMS but reset for safety
     equipSwimRing.classList.remove('floating');
     goldShine.classList.remove('active');
     goldBackdrop.classList.remove('active');
