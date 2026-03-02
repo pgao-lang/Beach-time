@@ -217,34 +217,11 @@ body {
 #itemSunCream { bottom: 4%;  left: 50%; transform: translateX(-50%); }
 #itemSwimRing { bottom: 20%; right: 5%; }
 
-/* ── Swim-ring drag interaction ─────────────────── */
-#itemSwimRing          { cursor: grab; touch-action: none; user-select: none; }
-#itemSwimRing.dragging { opacity: 0.25 !important; cursor: grabbing; }
-
 /* Glow the dog when a dragged item is hovering over it */
 #dogContainer.drop-glow {
   filter: drop-shadow(0 0 24px rgba(255, 220, 0, 1))
           drop-shadow(0 0 10px rgba(255, 180, 0, 0.85));
 }
-
-/* Small label beneath the swim ring to signal "drag me" */
-.drag-hint {
-  position: absolute;
-  bottom: -26px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.52);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  padding: 3px 10px;
-  border-radius: 10px;
-  white-space: nowrap;
-  pointer-events: none;
-  user-select: none;
-}
-#itemSwimRing.used .drag-hint { display: none; }
 
 /* ── Dog speech bubble ───────────────────────────── */
 #dogBubble {
@@ -818,7 +795,6 @@ body {
   <div id="itemSwimRing" class="sand-item">
     <img src="swim-ring.png" alt="Swim Ring">
     <div class="checkmark">&#10003;</div>
-    <div class="drag-hint">drag to dog ↑</div>
   </div>
 
   <!-- ── Dog container ── -->
@@ -906,11 +882,6 @@ body {
   let endShown  = false;
   let hintTimer = null;
 
-  // ── Drag state (swim ring) ─────────────────────────────────────────
-  let dragActive = false;
-  let dragClone  = null;
-  let dragOX     = 0;
-  let dragOY     = 0;
 
   // ── Elements ──────────────────────────────────────────────────────
   const dogContainer  = document.getElementById('dogContainer');
@@ -962,12 +933,10 @@ body {
 
   // ── Init ──────────────────────────────────────────────────────────
   function init() {
-    // Juice and sun-cream: click interaction
-    ITEMS.slice(0, 2).forEach(item =>
+    // All three items: click interaction
+    ITEMS.forEach(item =>
       item.el.addEventListener('click', () => onItemClick(item))
     );
-    // Swim ring: drag interaction
-    initRingDrag();
     // Dog drag (door scene)
     initDoorDogDrag();
     endOverlay.addEventListener('click', restart);
@@ -1112,7 +1081,7 @@ body {
     busy = true;
     dogBubble.classList.remove('visible');
 
-    // ── Swim ring: drag-and-drop — immediate swap, no fly animation ───
+    // ── Swim ring: click — immediate swap, no fly animation ──────────
     if (item.stepIdx === 2) {
       item.el.classList.add('used');
       item.el.querySelector('.checkmark').classList.add('shown');
@@ -1146,6 +1115,10 @@ body {
       crossfadeDog(DOG_STATES[step]);        // step 1→dogJuice, step 2→dogJuiceCream
       if (step === 1) {
         dogBubble.textContent = 'The sun is very hot today.';
+        void dogBubble.offsetWidth;
+        dogBubble.classList.add('visible');
+      } else if (step === 2) {
+        dogBubble.textContent = 'That swim ring looks pretty!';
         void dogBubble.offsetWidth;
         dogBubble.classList.add('visible');
       }
@@ -1206,133 +1179,6 @@ body {
     toEl.style.opacity      = '1';
     activeDog = toEl;
   }
-
-  // ══════════════════════════════════════════════════════════════════
-  // ── Swim-ring drag logic ──────────────────────────────────────────
-  // ══════════════════════════════════════════════════════════════════
-
-  function initRingDrag() {
-    itemSwimRing.addEventListener('mousedown',  onRingPointerDown);
-    itemSwimRing.addEventListener('touchstart', onRingTouchStart, { passive: false });
-  }
-
-  // ── pointer-down / touch-start ────────────────────────────────────
-  function onRingPointerDown(e) {
-    if (busy || endShown || itemSwimRing.classList.contains('used')) return;
-    e.preventDefault();
-    beginDrag(e.clientX, e.clientY);
-    document.addEventListener('mousemove', onRingPointerMove);
-    document.addEventListener('mouseup',   onRingPointerUp);
-  }
-
-  function onRingTouchStart(e) {
-    if (busy || endShown || itemSwimRing.classList.contains('used')) return;
-    e.preventDefault();
-    const t = e.touches[0];
-    beginDrag(t.clientX, t.clientY);
-    document.addEventListener('touchmove', onRingTouchMove, { passive: false });
-    document.addEventListener('touchend',  onRingTouchEnd);
-  }
-
-  // ── begin: spawn floating clone ───────────────────────────────────
-  function beginDrag(cx, cy) {
-    const rect  = itemSwimRing.getBoundingClientRect();
-    const imgEl = itemSwimRing.querySelector('img');
-
-    dragClone = document.createElement('img');
-    dragClone.src = imgEl.currentSrc || imgEl.src;
-    dragClone.style.cssText =
-      'position:fixed;'
-      + 'width:' + rect.width + 'px;height:' + rect.height + 'px;'
-      + 'object-fit:contain;pointer-events:none;z-index:500;'
-      + 'opacity:0.92;left:' + rect.left + 'px;top:' + rect.top + 'px;'
-      + 'transition:none;';
-    document.body.appendChild(dragClone);
-
-    dragOX     = cx - rect.left;
-    dragOY     = cy - rect.top;
-    dragActive = true;
-
-    itemSwimRing.classList.add('dragging');
-
-    // At step 2 (after juice+cream): show dialog and keep dog.png hidden.
-    // dogJuiceCream stays at full opacity — it IS the drop target.
-    if (step === 2) {
-      dogSad.style.opacity = '0';          // ensure dog.png never shows
-      dogBubble.textContent = 'That swim ring looks pretty!';
-      void dogBubble.offsetWidth;
-      dogBubble.classList.add('visible');
-    }
-  }
-
-  // ── move ──────────────────────────────────────────────────────────
-  function moveDrag(cx, cy) {
-    if (!dragActive || !dragClone) return;
-    dragClone.style.left = (cx - dragOX) + 'px';
-    dragClone.style.top  = (cy - dragOY) + 'px';
-
-    // Glow dog when the clone hovers over it (32 px tolerance for easier targeting)
-    const dr   = dogContainer.getBoundingClientRect();
-    const HIT  = 32;
-    const over = cx >= dr.left - HIT && cx <= dr.right  + HIT
-              && cy >= dr.top  - HIT && cy <= dr.bottom + HIT;
-    dogContainer.classList.toggle('drop-glow', over);
-  }
-
-  // ── end: drop or snap-back ────────────────────────────────────────
-  function endDrag(cx, cy) {
-    if (!dragActive) return;
-    dragActive = false;
-
-    document.removeEventListener('mousemove', onRingPointerMove);
-    document.removeEventListener('mouseup',   onRingPointerUp);
-    document.removeEventListener('touchmove', onRingTouchMove);
-    document.removeEventListener('touchend',  onRingTouchEnd);
-
-    dogContainer.classList.remove('drop-glow');
-
-    const dr       = dogContainer.getBoundingClientRect();
-    const HIT      = 32;
-    const onDog    = cx >= dr.left - HIT && cx <= dr.right  + HIT
-                  && cy >= dr.top  - HIT && cy <= dr.bottom + HIT;
-    const ringItem = ITEMS[2];
-
-    if (onDog) {
-      // Released on dog ─ evaluate step
-      removeDragClone();
-      itemSwimRing.classList.remove('dragging');
-      if (ringItem.stepIdx === step) {
-        applyItem(ringItem);
-      } else {
-        wrongItem(ringItem);
-      }
-    } else {
-      // Released elsewhere ─ animate clone back then restore
-      if (step === 2) {
-        dogBubble.classList.remove('visible');
-      }
-      const rect = itemSwimRing.getBoundingClientRect();
-      dragClone.style.transition = 'left .32s ease, top .32s ease, opacity .32s ease';
-      dragClone.style.left    = rect.left + 'px';
-      dragClone.style.top     = rect.top  + 'px';
-      dragClone.style.opacity = '0';
-      setTimeout(() => {
-        removeDragClone();
-        itemSwimRing.classList.remove('dragging');
-      }, 340);
-    }
-  }
-
-  // ── helpers ───────────────────────────────────────────────────────
-  function removeDragClone() {
-    if (dragClone && dragClone.parentNode) dragClone.parentNode.removeChild(dragClone);
-    dragClone = null;
-  }
-
-  function onRingPointerMove(e) { moveDrag(e.clientX, e.clientY); }
-  function onRingPointerUp(e)   { endDrag(e.clientX, e.clientY); }
-  function onRingTouchMove(e)   { e.preventDefault(); const t = e.touches[0]; moveDrag(t.clientX, t.clientY); }
-  function onRingTouchEnd(e)    { const t = e.changedTouches[0]; endDrag(t.clientX, t.clientY); }
 
   // ══════════════════════════════════════════════════════════════════
 
@@ -1463,12 +1309,6 @@ body {
 
   // ── Restart ───────────────────────────────────────────────────────
   function restart() {
-    // Cancel any live drag first
-    dragActive = false;
-    removeDragClone();
-    itemSwimRing.classList.remove('dragging');
-    dogContainer.classList.remove('drop-glow');
-
     step     = 0;
     busy     = false;
     endShown = false;
