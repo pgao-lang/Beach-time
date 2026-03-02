@@ -973,6 +973,74 @@ body {
     { el: itemSwimRing, equip: equipSwimRing,  stepIdx: 2, centered: false },
   ];
 
+  // ── Sound effects (Web Audio API – no external files) ───────────
+  const SFX = (() => {
+    let ctx = null;
+    function ac() {
+      if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    }
+    function tone(freq, type, vol, dur, delay) {
+      const c = ac(), t = c.currentTime + (delay || 0);
+      const o = c.createOscillator(), g = c.createGain();
+      o.connect(g); g.connect(c.destination);
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.start(t); o.stop(t + dur + 0.01);
+    }
+    function sweep(f0, f1, type, vol, dur, delay) {
+      const c = ac(), t = c.currentTime + (delay || 0);
+      const o = c.createOscillator(), g = c.createGain();
+      o.connect(g); g.connect(c.destination);
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(f0, t);
+      o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.start(t); o.stop(t + dur + 0.01);
+    }
+    function noise(vol, dur, cutoff, delay) {
+      const c = ac(), t = c.currentTime + (delay || 0);
+      const buf = c.createBuffer(1, Math.ceil(c.sampleRate * dur), c.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      const src = c.createBufferSource(), fi = c.createBiquadFilter(), g = c.createGain();
+      src.buffer = buf; fi.type = 'bandpass'; fi.frequency.value = cutoff || 1000;
+      src.connect(fi); fi.connect(g); g.connect(c.destination);
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      src.start(t); src.stop(t + dur + 0.01);
+    }
+    return {
+      doorCreak()      { sweep(220, 130, 'sawtooth', 0.18, 0.50);
+                         sweep(170,  90, 'sine',     0.10, 0.38, 0.06); },
+      dogEnter()       { sweep(340, 560, 'sine', 0.20, 0.14);
+                         tone(560, 'sine', 0.14, 0.20, 0.13); },
+      wrong()          { sweep(240,  95, 'sawtooth', 0.22, 0.30);
+                         noise(0.08, 0.25, 160); },
+      swish()          { sweep(880, 240, 'sine', 0.13, 0.28);
+                         noise(0.05, 0.22, 700); },
+      juice()          { [0, 0.07, 0.14, 0.21].forEach((d, i) =>
+                           tone(370 + i * 95, 'sine', 0.12, 0.16, d)); },
+      cream()          { sweep(440, 840, 'sine', 0.15, 0.15);
+                         tone(840, 'triangle', 0.11, 0.20, 0.14); },
+      happyTransform() { [523, 659, 784, 1047].forEach((f, i) =>
+                           tone(f, 'triangle', 0.18, 0.32, i * 0.09)); },
+      goldFanfare()    { [[523,0],[659,0.09],[784,0.18],[1047,0.30],[1319,0.43]].forEach(([f,d]) =>
+                           tone(f, 'triangle', 0.22, 0.42, d));
+                         noise(0.04, 0.35, 2400, 0.15); },
+      sparkle()        { [0,0.10,0.21,0.32,0.43,0.54,0.65].forEach(d =>
+                           tone(880 + Math.random() * 1200, 'sine', 0.09, 0.20, d)); },
+      splash()         { noise(0.18, 0.45, 580);
+                         sweep(430, 150, 'sine', 0.12, 0.38); },
+      chime()          { [[523,0],[659,0.11],[784,0.23]].forEach(([f,d]) =>
+                           tone(f, 'sine', 0.14, 0.55, d)); },
+    };
+  })();
+
   // ── Init ──────────────────────────────────────────────────────────
   function init() {
     // Juice & sun-cream: click; swim ring: drag to dog
@@ -999,6 +1067,7 @@ body {
     if (dogJustDragged) { dogJustDragged = false; return; }
     if (!doorScene.classList.contains('open')) {
       doorScene.classList.add('open');
+      SFX.doorCreak();
     }
     // Door is open: user must drag the dog — plain clicks do nothing
   }
@@ -1076,6 +1145,7 @@ body {
 
     if (onZone) {
       removeDogDragClone();
+      SFX.dogEnter();
       doorDog.style.opacity = '1';
       doorScene.classList.add('hidden');
       // Fully remove dog.png from rendering once the 0.6s opacity fade is done
@@ -1130,6 +1200,7 @@ body {
   }
 
   function beginSwimRingDrag(cx, cy) {
+    SFX.swish();
     const rect = itemSwimRing.getBoundingClientRect();
     swimRingDragOX = cx - rect.left;
     swimRingDragOY = cy - rect.top;
@@ -1207,6 +1278,7 @@ body {
 
   // ── Wrong order feedback ──────────────────────────────────────────
   function wrongItem(item) {
+    SFX.wrong();
     item.el.classList.remove('shake', 'shakeCentered');
     void item.el.offsetWidth;
     item.el.classList.add(item.centered ? 'shakeCentered' : 'shake');
@@ -1230,6 +1302,7 @@ body {
       updateHUD();
 
       // Smooth 0.65s crossfade (uses the CSS transition already defined)
+      SFX.happyTransform();
       crossfadeDog(dogHappy);
 
       busy = false;
@@ -1246,10 +1319,12 @@ body {
       updateHUD();
       crossfadeDog(DOG_STATES[step]);        // step 1→dogJuice, step 2→dogJuiceCream
       if (step === 1) {
+        SFX.juice();
         dogBubble.textContent = 'The sun is very hot today.';
         void dogBubble.offsetWidth;
         dogBubble.classList.add('visible');
       } else if (step === 2) {
+        SFX.cream();
         dogBubble.textContent = 'That swim ring looks pretty!';
         void dogBubble.offsetWidth;
         dogBubble.classList.add('visible');
@@ -1260,6 +1335,7 @@ body {
 
   // ── Fly animation ─────────────────────────────────────────────────
   function flyToDog(item, cb) {
+    SFX.swish();
     const fromRect = item.el.getBoundingClientRect();
     const dogRect  = dogContainer.getBoundingClientRect();
 
@@ -1330,12 +1406,13 @@ body {
 
   // ── Gold reward ───────────────────────────────────────
   function showGoldReward() {
+    SFX.goldFanfare();
     goldShine.classList.add('active');
     goldBackdrop.classList.add('active');
     goldAward.classList.add('pop');
     emitGoldParticles();
     // Show restart button 2 s after gold appears
-    setTimeout(() => { restartBtn.classList.add('visible'); }, 2000);
+    setTimeout(() => { restartBtn.classList.add('visible'); SFX.chime(); }, 2000);
   }
 
   function emitGoldParticles() {
@@ -1378,6 +1455,7 @@ body {
 
   // ── Stars ─────────────────────────────────────────────────────────
   function fireStars() {
+    SFX.sparkle();
     starBurst.innerHTML = '';
     const pal   = ['#FFD700','#FF6B6B','#7ECEF6','#98FB98','#FF69B4','#FFA500'];
     const spots = ['8% 50%','25% 12%','50% 55%','74% 10%','92% 48%','18% 82%','50% 0%','82% 80%'];
@@ -1413,6 +1491,7 @@ body {
 
   // ── Splash ────────────────────────────────────────────────────────
   function showSplash() {
+    SFX.splash();
     const r  = dogContainer.getBoundingClientRect();
     const cx = r.left + r.width / 2;
     const cy = r.bottom - r.height * 0.22;
