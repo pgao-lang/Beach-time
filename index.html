@@ -1034,6 +1034,8 @@ body {
       removeDogDragClone();
       doorDog.style.opacity = '1';
       doorScene.classList.add('hidden');
+      // Fully remove dog.png from rendering once the 0.6s opacity fade is done
+      setTimeout(() => { doorScene.style.display = 'none'; }, 650);
       busy = false;
       dogBubble.classList.add('visible');
     } else {
@@ -1081,27 +1083,18 @@ body {
     busy = true;
     dogBubble.classList.remove('visible');
 
-    // ── Swim ring: click — immediate swap, no fly animation ──────────
+    // ── Swim ring: click — smooth crossfade dog-juice-sun cream → happy-dog ─
     if (item.stepIdx === 2) {
       item.el.classList.add('used');
       item.el.querySelector('.checkmark').classList.add('shown');
       step++;
       updateHUD();
 
-      // Hard instant swap: dog-juice-sun cream → happy-dog (Rule 4)
-      dogJuiceCream.style.transition = 'none';
-      dogHappy.style.transition      = 'none';
-      dogJuiceCream.style.opacity    = '0';
-      dogHappy.style.opacity         = '1';
-      activeDog = dogHappy;
-      // Re-arm CSS transitions for any later crossfades
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        dogJuiceCream.style.transition = '';
-        dogHappy.style.transition      = '';
-      }));
+      // Smooth 0.65s crossfade (uses the CSS transition already defined)
+      crossfadeDog(dogHappy);
 
       busy = false;
-      setTimeout(completeAll, 420);
+      setTimeout(completeAll, 700); // wait for crossfade to finish (0.65s + buffer)
       return;
     }
 
