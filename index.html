@@ -71,8 +71,8 @@ body {
   bottom: 18%;
   left: 50%;
   transform: translateX(-50%);
-  width: clamp(360px, 46vw, 580px);
-  height: clamp(360px, 46vw, 580px);
+  width: clamp(440px, min(54vw, 54vh), 680px);
+  height: clamp(440px, min(54vw, 54vh), 680px);
 }
 
 #dogSad, #dogJuice, #dogJuiceCream, #dogHappy {
@@ -174,7 +174,7 @@ body {
 }
 
 .sand-item.used {
-  opacity: 0.35;
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -637,7 +637,7 @@ body {
 #doorScene #doorDog {
   position: relative;
   z-index: 1;
-  width: clamp(260px, 34vw, 480px);
+  width: clamp(330px, 44vw, 600px);
   height: auto;
   margin-right: clamp(20px, 5vw, 80px);
   margin-bottom: clamp(10px, 3vh, 50px);
