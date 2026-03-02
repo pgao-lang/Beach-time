@@ -1478,8 +1478,20 @@ body {
     goldParticles.innerHTML = '';
     restartBtn.classList.remove('visible');
     dogBubble.textContent = "I'm thirsty";
-    dogBubble.classList.add('visible');
+    dogBubble.classList.remove('visible');   // beach game will show it after dog drag
+
+    // Reset door scene to its original closed/hidden state
+    doorScene.style.display = '';            // clear the inline display:none from prev run
+    doorDog.style.animation = '';            // restore idle nudge animation
+    doorDog.style.opacity   = '1';
     doorScene.classList.remove('open');
+    doorScene.classList.add('hidden');       // keep hidden until startGame() shows it
+
+    // Restore swim ring opacity in case an aborted drag left it dim
+    itemSwimRing.style.opacity = '1';
+
+    // Return to the start screen
+    startOverlay.classList.remove('hidden');
   }
 
   init();
