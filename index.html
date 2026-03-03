@@ -1310,14 +1310,16 @@ body {
       return;
     }
 
-    // ── Juice / sun-cream: click items — fly animation then state change ─
+    // ── Juice / sun-cream: disappear + dog crossfade immediately on click ─
+    item.el.classList.add('used');
+    item.el.querySelector('.checkmark').classList.add('shown');
+    step++;
+    updateHUD();
+    crossfadeDog(DOG_STATES[step]);        // step 1→dogJuice, step 2→dogJuiceCream
+
+    // Fly animation plays as a decorative trail; equip + bubble land on arrival
     flyToDog(item, () => {
       item.equip.style.opacity = '1';
-      item.el.classList.add('used');
-      item.el.querySelector('.checkmark').classList.add('shown');
-      step++;
-      updateHUD();
-      crossfadeDog(DOG_STATES[step]);        // step 1→dogJuice, step 2→dogJuiceCream
       if (step === 1) {
         SFX.juice();
         dogBubble.textContent = 'The sun is very hot today.';
