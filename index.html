@@ -1294,30 +1294,29 @@ body {
     busy = true;
     dogBubble.classList.remove('visible');
 
-    // ── Swim ring: click — smooth crossfade dog-juice-sun cream → happy-dog ─
+    // ── Swim ring: drag-to-dog — crossfade; ring disappears after happy-dog shows ─
     if (item.stepIdx === 2) {
-      item.el.classList.add('used');
-      item.el.querySelector('.checkmark').classList.add('shown');
       step++;
       updateHUD();
 
-      // Smooth 0.65s crossfade (uses the CSS transition already defined)
       SFX.happyTransform();
       crossfadeDog(dogHappy);
+      // Hide swim ring once happy-dog has fully faded in (matches 0.65s CSS transition)
+      setTimeout(() => { item.el.classList.add('used'); }, 650);
 
       busy = false;
-      setTimeout(completeAll, 700); // wait for crossfade to finish (0.65s + buffer)
+      setTimeout(completeAll, 700);
       return;
     }
 
-    // ── Juice / sun-cream: disappear + dog crossfade immediately on click ─
-    item.el.classList.add('used');
-    item.el.querySelector('.checkmark').classList.add('shown');
+    // ── Juice / sun-cream: crossfade dog immediately; item disappears after dog shows ─
     step++;
     updateHUD();
     crossfadeDog(DOG_STATES[step]);        // step 1→dogJuice, step 2→dogJuiceCream
+    // Hide item once the dog crossfade has finished (matches 0.65s CSS transition)
+    setTimeout(() => { item.el.classList.add('used'); }, 650);
 
-    // Fly animation plays as a decorative trail; equip + bubble land on arrival
+    // Fly animation plays as a decorative trail; equip + bubble arrive with the clone
     flyToDog(item, () => {
       item.equip.style.opacity = '1';
       if (step === 1) {
