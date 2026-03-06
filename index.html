@@ -1410,8 +1410,6 @@ body {
     goldShine.classList.add('active');
     goldBackdrop.classList.add('active');
     goldAward.classList.add('pop');
-    equipSwimRing.style.opacity = '0';
-    equipSwimRing.classList.remove('floating');
     emitGoldParticles();
     // Show restart button 2 s after gold appears
     setTimeout(() => { restartBtn.classList.add('visible'); SFX.chime(); }, 2000);
@@ -1481,8 +1479,6 @@ body {
     dogContainer.style.bottom = '58%';
     setTimeout(() => {
       showSplash();
-      equipSwimRing.style.opacity = '1';
-      equipSwimRing.classList.add('floating');
       setTimeout(() => {
         dogContainer.style.transition = 'none';
         dogContainer.style.animation  = 'dogBob 1.6s ease-in-out infinite';
