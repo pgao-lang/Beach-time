@@ -1302,7 +1302,7 @@ body {
       SFX.happyTransform();
       crossfadeDog(dogHappy);
       // Hide swim ring once happy-dog has fully faded in (matches 0.65s CSS transition)
-      setTimeout(() => { item.el.classList.add('used'); }, 650);
+      setTimeout(() => { item.el.style.opacity = ''; item.el.classList.add('used'); }, 650);
 
       busy = false;
       setTimeout(completeAll, 700);
