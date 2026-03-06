@@ -1316,9 +1316,8 @@ body {
     // Hide item once the dog crossfade has finished (matches 0.65s CSS transition)
     setTimeout(() => { item.el.classList.add('used'); }, 650);
 
-    // Fly animation plays as a decorative trail; equip + bubble arrive with the clone
+    // Fly animation plays as a decorative trail; bubble arrives with the clone
     flyToDog(item, () => {
-      item.equip.style.opacity = '1';
       if (step === 1) {
         SFX.juice();
         dogBubble.textContent = 'The sun is very hot today.';
